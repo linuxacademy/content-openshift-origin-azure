@@ -237,7 +237,7 @@
       "apiVersion": "2013-03-01",
       "copy": {
         "name": "nodeSet",
-        "count": "[parameters('numberOfNodes')]"
+        "count": "[variables('numberOfNodes')]"
       },
       "dependsOn": [
         "[concat('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'))]"
@@ -253,7 +253,7 @@
             "value": "[concat('node', padLeft(add(copyindex(), 1), 2, '0'))]"
           },
           "vhdStorageType": {
-            "value": "[parameters('nodeVMstorType')]"
+            "value": "[variables('nodeVMstorType')]"
           },
           "subnetRef": {
             "value": "[variables('nodeSubnetRef')]"
@@ -262,19 +262,19 @@
             "value": "[variables('nodesASName')]"
           },
           "vmSize": {
-            "value": "[parameters('nodeVMSize')]"
+            "value": "[variables('nodeVMSize')]"
           },
           "adminUsername": {
-            "value": "[parameters('adminUsername')]"
+            "value": "[variables('adminUsername')]"
           },
           "sshKeyData": {
-            "value": "[parameters('sshKeyData')]"
+            "value": "[variables('sshKeyData')]"
           },
           "baseTemplateUrl": {
             "value": "[variables('baseTemplateUrl')]"
           },
           "imageReference": {
-            "value": "[variables(parameters('image'))]"
+            "value": "[variables(variables('image'))]"
           }
         }
       }
@@ -304,22 +304,22 @@
             "value": "[variables('jumpboxSubnetRef')]"
           },
           "vmSize": {
-            "value": "[parameters('jumpVMSize')]"
+            "value": "[variables('jumpVMSize')]"
           },
           "vhdStorageType": {
-            "value": "[parameters('jumpVMstorType')]"
+            "value": "[variables('jumpVMstorType')]"
           },
           "adminUsername": {
-            "value": "[parameters('adminUsername')]"
+            "value": "[variables('adminUsername')]"
           },
           "sshKeyData": {
-            "value": "[parameters('sshKeyData')]"
+            "value": "[variables('sshKeyData')]"
           },
           "baseTemplateUrl": {
             "value": "[variables('baseTemplateUrl')]"
           },
           "imageReference": {
-            "value": "[variables(parameters('image'))]"
+            "value": "[variables(variables('image'))]"
           },
           "fqdn": {
             "value": "[reference(variables('masterpipname')).dnsSettings.fqdn]"
@@ -328,13 +328,13 @@
             "value": "[reference(resourceId('Microsoft.Network/publicIPAddresses', variables('infrapipname'))).ipAddress]"
           },
           "numberOfNodes": {
-            "value": "[parameters('numberOfNodes')]"
+            "value": "[variables('numberOfNodes')]"
           },
           "numberOfMasterNodes": {
-            "value": "[parameters('numberOfMasterNodes')]"
+            "value": "[variables('numberOfMasterNodes')]"
           },
           "numberOfInfraNodes": {
-            "value": "[parameters('numberOfinfrasndes')]"
+            "value": "[variables('numberOfinfrasndes')]"
           }
         }
       }
@@ -345,7 +345,7 @@
       "apiVersion": "2013-03-01",
       "copy": {
         "name": "masterLoop",
-        "count": "[parameters('numberOfMasterNodes')]"
+        "count": "[variables('numberOfMasterNodes')]"
       },
       "dependsOn": [
         "[concat('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'))]",
@@ -366,25 +366,25 @@
             "value": "[variables('masterSubnetRef')]"
           },
           "vmSize": {
-            "value": "[parameters('masterVMSize')]"
+            "value": "[variables('masterVMSize')]"
           },
           "vhdStorageType": {
-            "value": "[parameters('masterVMstorType')]"
+            "value": "[variables('masterVMstorType')]"
           },
           "adminUsername": {
-            "value": "[parameters('adminUsername')]"
+            "value": "[variables('adminUsername')]"
           },
           "adminPassword": {
-            "value": "[parameters('adminPassword')]"
+            "value": "[variables('adminPassword')]"
           },
           "sshKeyData": {
-            "value": "[parameters('sshKeyData')]"
+            "value": "[variables('sshKeyData')]"
           },
           "baseTemplateUrl": {
             "value": "[variables('baseTemplateUrl')]"
           },
           "imageReference": {
-            "value": "[variables(parameters('image'))]"
+            "value": "[variables(variables('image'))]"
           },
           "ASName": {
             "value": "[variables('masterASName')]"
@@ -401,7 +401,7 @@
       "apiVersion": "2013-03-01",
       "copy": {
         "name": "infraLoop",
-        "count": "[parameters('numberOfinfrasndes')]"
+        "count": "[variables('numberOfinfrasndes')]"
       },
       "dependsOn": [
         "[concat('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'))]",
@@ -419,25 +419,25 @@
             "value": "[concat('infranode', add(copyindex(), 1))]"
           },
           "vhdStorageType": {
-            "value": "[parameters('infranodeVMstorType')]"
+            "value": "[variables('infranodeVMstorType')]"
           },
           "subnetRef": {
             "value": "[variables('infranodeSubnetRef')]"
           },
           "vmSize": {
-            "value": "[parameters('infranodeVMSize')]"
+            "value": "[variables('infranodeVMSize')]"
           },
           "adminUsername": {
-            "value": "[parameters('adminUsername')]"
+            "value": "[variables('adminUsername')]"
           },
           "sshKeyData": {
-            "value": "[parameters('sshKeyData')]"
+            "value": "[variables('sshKeyData')]"
           },
           "baseTemplateUrl": {
             "value": "[variables('baseTemplateUrl')]"
           },
           "imageReference": {
-            "value": "[variables(parameters('image'))]"
+            "value": "[variables(variables('image'))]"
           },
           "ASName": {
             "value": "[variables('infraASName')]"
@@ -620,7 +620,7 @@
       "properties": {
         "publicIPAllocationMethod": "[variables('masterppipaddresstype')]",
         "dnsSettings": {
-          "domainNameLabel": "[parameters('masterDNSName')]"
+          "domainNameLabel": "[variables('masterDNSName')]"
         }
       }
     },

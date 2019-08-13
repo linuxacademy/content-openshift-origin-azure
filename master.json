@@ -19,7 +19,7 @@
   "infrapipname": "infraPip",
   "numberOfNodes": 1,
   "numberOfMasterNodes": 1,
-  "numberOfInfrasNodes": 1,
+  "numberOfInfraNodes": 1,
   "masterpipname": "masterPip",
   "ASName": "masterAS",
   "apiVersion": "2015-06-15",

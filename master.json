@@ -1,57 +1,80 @@
 ﻿{
     "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
-  "parameters": {
-    "vmName": {
-      "type": "string"
-    },
-    "subnetRef": {
-      "type": "string"
-    },
-    "vmSize": {
-      "type": "string"
-    },
-    "vhdStorageType": {
-      "type": "string"
-    },
-    "adminUsername": {
-      "type": "string"
-    },
-    "adminPassword": {
-      "type": "securestring"
-    },
-    "sshKeyData": {
-      "type": "string",
-      "metadata": {
-        "description": "SSH rsa public key file as a string."
-      }
-    },
-    "baseTemplateUrl": {
-      "type": "string"
-    },
-    "imageReference": {
-      "type": "object",
-      "metadata": {
-        "description": "imageReference object that should be used to create the virtual machine"
-      }
-    },
-    "ASName": {
-      "type": "string",
-      "metadata": {
-        "description": "name of the availability set the master will be joined to"
-      }
-    },
-    "backEndAddressPool": {
-      "type": "string",
-      "metadata": {
-        "description": "resourceId of the master loadbalancer backendpool this machine will be joined to"
-      }
-    }
-  },
+  "parameters": {},
   "variables": {
     "apiVersion": "2015-06-15",
-    "sshKeyPath": "[concat('/home/',parameters('adminUsername'),'/.ssh/authorized_keys')]",
-    "storageAccountName": "[concat(parameters('vmName'), uniqueString(resourceGroup().id))]" 
+    "sshKeyPath": "[concat('/home/',variables('adminUsername'),'/.ssh/authorized_keys')]",
+    "storageAccountName": "[toLower( concat(variables('vmName'), uniqueString(resourceGroup().id) ))]",
+    "baseTemplateUrl": "https://raw.githubusercontent.com/linuxacademy/content-openshift-origin-azure/master/",
+    "baseVMachineTemplateUriInfranode": "[concat(variables('baseTemplateUrl'), 'infranode.json')]",
+    "baseVMachineTemplateUriNode": "[concat(variables('baseTemplateUrl'), 'node.json')]",
+    "baseVMachineTemplateUriMaster": "[concat(variables('baseTemplateUrl'), 'master.json')]",
+    "baseVMachineTemplateUriJumpBox": "[concat(variables('baseTemplateUrl'), 'jumpbox.json')]",
+    "adminUsername": "azureuser",
+    "adminPassword": "ChangeMe123!",
+    "sshKeyData": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDiUArYdiOpKBDZJbEdsaNt5MhpxQijUQs0Z/eO70B1uR0qGhps3mk9Q4SVUtVNkrZMqOAKNTBZf31YzkSccWIEt3ajlxtTrZrLrA8qABCBWrv50O4SRUblIwBilb69NLWH9oPYN6pzDXzh702ENYk0a/kbyYoZhPZaBv34edMDTu6XFK1KRx5xeord88zwh+lf+oO/ZIWYtxoYErb7Fomfu/e0afsqMGxCt9G97fSw9HgvQ0lN4MR66sSIhkcMfvY3b8SqS/YqFPciqfOD1nyXFtoxv4A1Pjua+9zhDEyL/yiXYSPfnLwvypPI/DoM6syrz1VAGmuealw8IKzTdUcP",
+    "masterDnsName": "",
+    "numberOfMasterNodes": 1,
+    "vmName": "masterVM",
+    "masterVMSize": "Standard_B1ms",
+    "masterVMstorType": "Standard_LRS",
+    "numberOfinfrasndes": 1,
+    "infranodeVMSize": "Standard_B1ms",
+    "infranodeVMstorType": "Standard_LRS",
+    "numberOfNodes": 1,
+    "nodeVMSize": "Standard_B1ms",
+    "nodeVMstorType": "Standard_LRS",
+    "jumpVMSize": "Standard_B1ms",
+    "jumpVMstorType": "Standard_LRS",
+    "image": "centos",
+    "location": "[resourceGroup().location]",
+    "virtualNetworkName": "openshiftVnet",
+    "addressPrefix": "10.41.0.0/16",
+    "infranodesubnetName": "infranodeSubnet",
+    "infranodeSubnetNSGName": "infraSubnetNSG",
+    "infranodesubnetPrefix": "10.41.2.0/24",
+    "infrapipname": "infraPip",
+    "infrapipaddresstype": "Static",
+    "infralbName": "infraLB",
+    "infralbid": "[resourceId('Microsoft.Network/loadBalancers', variables('infralbName'))]",
+    "infraASName": "infraAS",
+    "jumpnodesubnetName": "jumpBoxSubnet",
+    "jumpnodesubnetNameNSG": "jumpBoxSubnetNSG",
+    "jumpnodesubnetPrefix": "10.41.3.0/24",
+    "nodesubnetName": "nodeSubnet",
+    "nodesubnetPrefix": "10.41.1.0/24",
+    "mastersubnetName": "masterSubnet",
+    "mastersubnetNSGName": "masterSubnetNSG",
+    "mastersubnetPrefix": "10.41.0.0/24",
+    "masterpipname": "masterPip",
+    "masterppipaddresstype": "Dynamic",
+    "masterlbName": "masterLB",
+    "masterlbid": "[resourceId('Microsoft.Network/loadBalancers', variables('masterlbName'))]",
+    "masterASName": "masterAS",
+    "apiVersion": "2015-06-15",
+    "infranodeStorageName": "[concat(uniqueString(resourceGroup().id), 'infranodesa')]",
+    "nodeStorageName": "[concat(uniqueString(resourceGroup().id), 'nodesa')]",
+    "masterStorageName": "[concat(uniqueString(resourceGroup().id), 'mastersa')]",
+    "vhdStorageType": "Standard_LRS",
+    "vnetId": "[resourceId('Microsoft.Network/virtualNetworks', variables('virtualNetworkName'))]",
+    "infranodeSubnetRef": "[concat(variables('vnetId'), '/subnets/', variables('infranodesubnetName'))]",
+    "nodeSubnetRef": "[concat(variables('vnetId'), '/subnets/', variables('nodesubnetName'))]",
+    "jumpboxSubnetRef": "[concat(variables('vnetId'), '/subnets/', variables('jumpnodesubnetName'))]",
+    "nodesASName": "nodesAS",
+    "masterSubnetRef": "[concat(variables('vnetId'), '/subnets/', variables('mastersubnetName'))]",
+    "centos": {
+      "publisher": "Openlogic",
+      "offer": "CentOS",
+      "sku": "7.2",
+      "version": "latest"
+    },
+    "rhel": {
+      "publisher": "RedHat",
+      "offer": "RHEL",
+      "sku": "7.2",
+      "version": "latest"
+    } 
   },
   "resources": [
     {
@@ -64,14 +87,14 @@
       },
       "properties": {},
       "sku": {
-        "name": "[parameters('vhdStorageType')]"
+        "name": "[variables('vhdStorageType')]"
       },
       "kind": "Storage"
     },
     {
       "apiVersion": "[variables('apiVersion')]",
       "type": "Microsoft.Network/networkInterfaces",
-      "name": "[concat(parameters('vmName'), 'nic')]",
+      "name": "[concat(variables('vmName'), 'nic')]",
       "location": "[resourceGroup().location]",
       "tags": {
         "displayName": "NetworkInterface"
@@ -83,11 +106,11 @@
             "properties": {
               "privateIPAllocationMethod": "Dynamic",
               "subnet": {
-                "id": "[parameters('subnetRef')]"
+                "id": "[variables('subnetRef')]"
               },
               "loadBalancerBackendAddressPools": [
                 {
-                  "id": "[parameters('BackEndAddressPool')]"
+                  "id": "[variables('BackEndAddressPool')]"
                 }
               ]
             }
@@ -98,40 +121,40 @@
     {
       "apiVersion": "2016-03-30",
       "type": "Microsoft.Compute/virtualMachines",
-      "name": "[parameters('vmName')]",
+      "name": "[variables('vmName')]",
       "location": "[resourceGroup().location]",
       "tags": {
         "displayName": "VirtualMachine"
       },
       "dependsOn": [
-        "[concat('Microsoft.Network/networkInterfaces/', concat(parameters('vmName'), 'nic'))]",
+        "[concat('Microsoft.Network/networkInterfaces/', concat(variables('vmName'), 'nic'))]",
         "[resourceId('Microsoft.Storage/storageAccounts/', variables('storageAccountName'))]"
       ],
       "properties": {
         "hardwareProfile": {
-          "vmSize": "[parameters('vmSize')]"
+          "vmSize": "[variables('vmSize')]"
         },
         "osProfile": {
-          "computerName": "[parameters('vmName')]",
-          "adminUsername": "[parameters('adminUsername')]",
+          "computerName": "[variables('vmName')]",
+          "adminUsername": "[variables('adminUsername')]",
           "linuxConfiguration": {
             "disablePasswordAuthentication": "true",
             "ssh": {
               "publicKeys": [
                 {
                   "path": "[variables('sshKeyPath')]",
-                  "keyData": "[parameters('sshKeyData')]"
+                  "keyData": "[variables('sshKeyData')]"
                 }
               ]
             }
           }
         },
         "storageProfile": {
-          "imageReference": "[parameters('imageReference')]",
+          "imageReference": "[variables('imageReference')]",
           "osDisk": {
             "name": "osdisk",
             "vhd": {
-              "uri": "[concat(reference(resourceId('Microsoft.Storage/storageAccounts/', variables('storageAccountName')), '2016-01-01').primaryEndpoints.blob, 'openshiftvmachines/', parameters('vmName'), '.vhd')]"
+              "uri": "[concat(reference(resourceId('Microsoft.Storage/storageAccounts/', variables('storageAccountName')), '2016-01-01').primaryEndpoints.blob, 'openshiftvmachines/', variables('vmName'), '.vhd')]"
             },
             "caching": "ReadWrite",
             "createOption": "FromImage"
@@ -144,18 +167,18 @@
               "lun": 0,
               "name": "datadisk1",
               "vhd": {
-                "uri": "[concat(reference(resourceId('Microsoft.Storage/storageAccounts/', variables('storageAccountName')), '2016-01-01').primaryEndpoints.blob, 'openshiftvmachines/', parameters('vmName'), '_datadisk1.vhd')]"
+                "uri": "[concat(reference(resourceId('Microsoft.Storage/storageAccounts/', variables('storageAccountName')), '2016-01-01').primaryEndpoints.blob, 'openshiftvmachines/', variables('vmName'), '_datadisk1.vhd')]"
               }
             }          
           ]
         },
         "availabilitySet": {
-          "id": "[resourceId('Microsoft.Compute/availabilitySets', parameters('ASName'))]"
+          "id": "[resourceId('Microsoft.Compute/availabilitySets', variables('ASName'))]"
         },
         "networkProfile": {
           "networkInterfaces": [
             {
-              "id": "[resourceId('Microsoft.Network/networkInterfaces', concat(parameters('vmName'), 'nic'))]"
+              "id": "[resourceId('Microsoft.Network/networkInterfaces', concat(variables('vmName'), 'nic'))]"
             }
           ]
         }
@@ -163,22 +186,22 @@
     },
     {
       "type": "Microsoft.Compute/virtualMachines/extensions",
-      "name": "[concat(parameters('vmName'),'/installcustomscript')]",
+      "name": "[concat(variables('vmName'),'/installcustomscript')]",
       "apiVersion": "[variables('apiVersion')]",
       "location": "[resourceGroup().location]",
       "tags": {
         "displayName": "VirtualMachineCustomScriptExtension"
       },
       "dependsOn": [
-        "[concat('Microsoft.Compute/virtualMachines/', parameters('vmName'))]"
+        "[concat('Microsoft.Compute/virtualMachines/', variables('vmName'))]"
       ],
       "properties": {
         "publisher": "Microsoft.OSTCExtensions",
         "type": "CustomScriptForLinux",
         "typeHandlerVersion": "1.3",
         "settings": {
-          "fileUris": [ "[concat(parameters('baseTemplateUrl'), 'master.sh')]" ],
-          "commandToExecute": "[ concat('sh master.sh ', parameters('adminUsername'), ' ', parameters('adminPassword') ) ]"
+          "fileUris": [ "[concat(variables('baseTemplateUrl'), 'master.sh')]" ],
+          "commandToExecute": "[ concat('sh master.sh ', variables('adminUsername'), ' ', variables('adminPassword') ) ]"
         }
       }
     }

@@ -1,6 +1,7 @@
 ﻿{
   "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
+  "parameters": {},
   "variables": {
     "baseTemplateUrl": "https://raw.githubusercontent.com/linuxacademy/content-openshift-origin-azure/master/",
     "baseVMachineTemplateUriInfranode": "[concat(variables('baseTemplateUrl'), 'infranode.json')]",
@@ -11,7 +12,7 @@
     "adminPassword": "ChangeMe123!",
     "sshKeyData": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDiUArYdiOpKBDZJbEdsaNt5MhpxQijUQs0Z/eO70B1uR0qGhps3mk9Q4SVUtVNkrZMqOAKNTBZf31YzkSccWIEt3ajlxtTrZrLrA8qABCBWrv50O4SRUblIwBilb69NLWH9oPYN6pzDXzh702ENYk0a/kbyYoZhPZaBv34edMDTu6XFK1KRx5xeord88zwh+lf+oO/ZIWYtxoYErb7Fomfu/e0afsqMGxCt9G97fSw9HgvQ0lN4MR66sSIhkcMfvY3b8SqS/YqFPciqfOD1nyXFtoxv4A1Pjua+9zhDEyL/yiXYSPfnLwvypPI/DoM6syrz1VAGmuealw8IKzTdUcP",
     "masterDnsName": "",
-    "numberOfMasterNodes": 3,
+    "numberOfMasterNodes": 1,
     "masterVMSize": "Standard_B1ms",
     "masterVMstorType": "Standard_LRS",
     "numberOfinfrasndes": 1,
@@ -71,7 +72,6 @@
       "version": "latest"
     }
   },
-  "parameters": {},
   "resources": [
     {
       "apiVersion": "[variables('apiVersion')]",

@@ -3,11 +3,27 @@
   "contentVersion": "1.0.0.0",
   "parameters": {},
   "variables": {
+    "baseTemplateUrl": "https://raw.githubusercontent.com/linuxacademy/content-openshift-origin-azure/master/",
     "adminUsername": "azureuser",
     "vmName": "infranode",
+    "VMSize": "Standard_B1ms", 
     "vhdStorageType": "Standard_LRS",
+    "subnetRef": "[concat(variables('vnetId'), '/subnets/', variables('subnetName'))]",
+    "vnetId": "[resourceId('Microsoft.Network/virtualNetworks', variables('virtualNetworkName'))]",
+    "subnetName": "infranodeSubnet",
+    "virtualNetworkName": "openshiftVnet",
+    "imageReference": "centos",
+    "fqdn": "[reference(variables('masterpipname')).dnsSettings.fqdn]",
+    "routerExtIP": "[reference(resourceId('Microsoft.Network/publicIPAddresses', variables('infrapipname'))).ipAddress]",
+    "infrapipname": "infraPip",
+    "numberOfNodes": 1,
+    "numberOfMasterNodes": 1,
+    "numberOfInfrasNodes": 1,
+    "masterpipname": "masterPip",
+    "ASName": "infraAS",
     "apiVersion": "2015-06-15",
     "sshKeyPath": "[concat('/home/',variables('adminUsername'),'/.ssh/authorized_keys')]",
+    "sshKeyData": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDiUArYdiOpKBDZJbEdsaNt5MhpxQijUQs0Z/eO70B1uR0qGhps3mk9Q4SVUtVNkrZMqOAKNTBZf31YzkSccWIEt3ajlxtTrZrLrA8qABCBWrv50O4SRUblIwBilb69NLWH9oPYN6pzDXzh702ENYk0a/kbyYoZhPZaBv34edMDTu6XFK1KRx5xeord88zwh+lf+oO/ZIWYtxoYErb7Fomfu/e0afsqMGxCt9G97fSw9HgvQ0lN4MR66sSIhkcMfvY3b8SqS/YqFPciqfOD1nyXFtoxv4A1Pjua+9zhDEyL/yiXYSPfnLwvypPI/DoM6syrz1VAGmuealw8IKzTdUcP",
     "storageAccountName": "[concat(variables('vmName'), uniqueString(resourceGroup().id))]"
   },
   "resources": [
@@ -43,12 +59,7 @@
               "privateIPAllocationMethod": "Dynamic",
               "subnet": {
                 "id": "[variables('subnetRef')]"
-              },
-              "loadBalancerBackendAddressPools": [
-                {
-                  "id": "[variables('BackEndAddressPool')]"
-                }
-              ]
+              }
             }
           }
         ]

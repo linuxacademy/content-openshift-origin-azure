@@ -15,7 +15,7 @@
     "numberOfMasterNodes": 1,
     "masterVMSize": "Standard_B1ms",
     "masterVMstorType": "Standard_LRS",
-    "numberOfinfrasndes": 1,
+    "numberOfInfrasNodes": 1,
     "infranodeVMSize": "Standard_B1ms",
     "infranodeVMstorType": "Standard_LRS",
     "numberOfNodes": 1,

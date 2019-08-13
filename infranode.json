@@ -4,6 +4,7 @@
   "parameters": {},
   "variables": {
     "adminUsername": "azureuser",
+    "vmName": "infranode",
     "apiVersion": "2015-06-15",
     "sshKeyPath": "[concat('/home/',variables('adminUsername'),'/.ssh/authorized_keys')]",
     "storageAccountName": "[concat(variables('vmName'), uniqueString(resourceGroup().id))]"

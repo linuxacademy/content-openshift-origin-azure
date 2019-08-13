@@ -248,37 +248,19 @@
           "uri": "[variables('baseVMachineTemplateUriNode')]",
           "contentVersion": "1.0.0.0"
         },
-        "parameters": {
-          "vmName": {
-            "value": "[concat('node', padLeft(add(copyindex(), 1), 2, '0'))]"
-          },
-          "vhdStorageType": {
-            "value": "[variables('nodeVMstorType')]"
-          },
-          "subnetRef": {
-            "value": "[variables('nodeSubnetRef')]"
-          },
-          "ASName": {
-            "value": "[variables('nodesASName')]"
-          },
-          "vmSize": {
-            "value": "[variables('nodeVMSize')]"
-          },
-          "adminUsername": {
-            "value": "[variables('adminUsername')]"
-          },
-          "sshKeyData": {
-            "value": "[variables('sshKeyData')]"
-          },
-          "baseTemplateUrl": {
-            "value": "[variables('baseTemplateUrl')]"
-          },
-          "imageReference": {
-            "value": "[variables(variables('image'))]"
+        "variables": {
+          "vmName": "[concat('node', padLeft(add(copyindex(), 1), 2, '0'))]",
+          "vhdStorageType": "[variables('nodeVMstorType')]",
+          "subnetRef": "[variables('nodeSubnetRef')]",
+          "ASName": "[variables('nodesASName')]",
+          "vmSize": "[variables('nodeVMSize')]",
+          "adminUsername": "[variables('adminUsername')]",
+          "sshKeyData": "[variables('sshKeyData')]",
+          "baseTemplateUrl": "[variables('baseTemplateUrl')]",
+          "imageReference": "[variables(variables('image'))]"
           }
         }
-      }
-    },
+      },
     {
       "name": "jumpbox",
       "type": "Microsoft.Resources/deployments",
@@ -296,49 +278,23 @@
           "uri": "[variables('baseVMachineTemplateUriJumpBox')]",
           "contentVersion": "1.0.0.0"
         },
-        "parameters": {
-          "vmName": {
-            "value": "jumpbox"
-          },
-          "subnetRef": {
-            "value": "[variables('jumpboxSubnetRef')]"
-          },
-          "vmSize": {
-            "value": "[variables('jumpVMSize')]"
-          },
-          "vhdStorageType": {
-            "value": "[variables('jumpVMstorType')]"
-          },
-          "adminUsername": {
-            "value": "[variables('adminUsername')]"
-          },
-          "sshKeyData": {
-            "value": "[variables('sshKeyData')]"
-          },
-          "baseTemplateUrl": {
-            "value": "[variables('baseTemplateUrl')]"
-          },
-          "imageReference": {
-            "value": "[variables(variables('image'))]"
-          },
-          "fqdn": {
-            "value": "[reference(variables('masterpipname')).dnsSettings.fqdn]"
-          },
-          "routerExtIP": {
-            "value": "[reference(resourceId('Microsoft.Network/publicIPAddresses', variables('infrapipname'))).ipAddress]"
-          },
-          "numberOfNodes": {
-            "value": "[variables('numberOfNodes')]"
-          },
-          "numberOfMasterNodes": {
-            "value": "[variables('numberOfMasterNodes')]"
-          },
-          "numberOfInfraNodes": {
-            "value": "[variables('numberOfinfrasndes')]"
+        "variables": {
+          "vmName": "jumpbox",
+          "subnetRef": "[variables('jumpboxSubnetRef')]",
+          "vmSize": "[variables('jumpVMSize')]",
+          "vhdStorageType": "[variables('jumpVMstorType')]",
+          "adminUsername": "[variables('adminUsername')]",
+          "sshKeyData": "[variables('sshKeyData')]",
+          "baseTemplateUrl": "[variables('baseTemplateUrl')]",
+          "imageReference": "[variables(variables('image'))]",
+          "fqdn": "[reference(variables('masterpipname')).dnsSettings.fqdn]",
+          "routerExtIP": "[reference(resourceId('Microsoft.Network/publicIPAddresses', variables('infrapipname'))).ipAddress]",
+          "numberOfNodes": "[variables('numberOfNodes')]",
+          "numberOfMasterNodes": "[variables('numberOfMasterNodes')]",
+          "numberOfInfraNodes": "[variables('numberOfinfrasndes')]"
           }
         }
-      }
-    },
+      },
     {
       "name": "[concat('master', copyIndex())]",
       "type": "Microsoft.Resources/deployments",
@@ -358,43 +314,21 @@
           "uri": "[variables('baseVMachineTemplateUriMaster')]",
           "contentVersion": "1.0.0.0"
         },
-        "parameters": {
-          "vmName": {
-            "value": "[concat('master', add(copyindex(), 1))]"
-          },
-          "subnetRef": {
-            "value": "[variables('masterSubnetRef')]"
-          },
-          "vmSize": {
-            "value": "[variables('masterVMSize')]"
-          },
-          "vhdStorageType": {
-            "value": "[variables('masterVMstorType')]"
-          },
-          "adminUsername": {
-            "value": "[variables('adminUsername')]"
-          },
-          "adminPassword": {
-            "value": "[variables('adminPassword')]"
-          },
-          "sshKeyData": {
-            "value": "[variables('sshKeyData')]"
-          },
-          "baseTemplateUrl": {
-            "value": "[variables('baseTemplateUrl')]"
-          },
-          "imageReference": {
-            "value": "[variables(variables('image'))]"
-          },
-          "ASName": {
-            "value": "[variables('masterASName')]"
-          },
-          "backEndAddressPool": {
-            "value": "[concat(variables('masterlbid'), '/backendAddressPools/BackendPool')]"
+        "variables": {
+          "vmName": "[concat('master', add(copyindex(), 1))]",
+          "subnetRef": "[variables('masterSubnetRef')]",
+          "vmSize": "[variables('masterVMSize')]",
+          "vhdStorageType": "[variables('masterVMstorType')]",
+          "adminUsername": "[variables('adminUsername')]",
+          "adminPassword": "[variables('adminPassword')]",
+          "sshKeyData": "[variables('sshKeyData')]",
+          "baseTemplateUrl": "[variables('baseTemplateUrl')]",
+          "imageReference": "[variables(variables('image'))]",
+          "ASName": "[variables('masterASName')]",
+          "backEndAddressPool": "[concat(variables('masterlbid'), '/backendAddressPools/BackendPool')]"
           }
         }
-      }
-    },
+      },
     {
       "name": "[concat('infranode', copyIndex())]",
       "type": "Microsoft.Resources/deployments",
@@ -414,40 +348,20 @@
           "uri": "[variables('baseVMachineTemplateUriInfranode')]",
           "contentVersion": "1.0.0.0"
         },
-        "parameters": {
-          "vmName": {
-            "value": "[concat('infranode', add(copyindex(), 1))]"
-          },
-          "vhdStorageType": {
-            "value": "[variables('infranodeVMstorType')]"
-          },
-          "subnetRef": {
-            "value": "[variables('infranodeSubnetRef')]"
-          },
-          "vmSize": {
-            "value": "[variables('infranodeVMSize')]"
-          },
-          "adminUsername": {
-            "value": "[variables('adminUsername')]"
-          },
-          "sshKeyData": {
-            "value": "[variables('sshKeyData')]"
-          },
-          "baseTemplateUrl": {
-            "value": "[variables('baseTemplateUrl')]"
-          },
-          "imageReference": {
-            "value": "[variables(variables('image'))]"
-          },
-          "ASName": {
-            "value": "[variables('infraASName')]"
-          },
-          "backEndAddressPool": {
-            "value": "[concat(variables('infralbid'), '/backendAddressPools/BackendPool')]"
+        "variables": {
+          "vmName": "[concat('infranode', add(copyindex(), 1))]",
+          "vhdStorageType": "[variables('infranodeVMstorType')]",
+          "subnetRef": "[variables('infranodeSubnetRef')]",
+          "vmSize": "[variables('infranodeVMSize')]",
+          "adminUsername": "[variables('adminUsername')]",
+          "sshKeyData": "[variables('sshKeyData')]",
+          "baseTemplateUrl": "[variables('baseTemplateUrl')]",
+          "imageReference": "[variables(variables('image'))]",
+          "ASName": "[variables('infraASName')]",
+          "backEndAddressPool": "[concat(variables('infralbid'), '/backendAddressPools/BackendPool')]"
           }
         }
-      }
-    },
+      },
     {
       "type": "Microsoft.Network/loadBalancers",
       "tags": {

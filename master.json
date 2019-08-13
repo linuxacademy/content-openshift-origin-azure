@@ -3,6 +3,7 @@
   "contentVersion": "1.0.0.0",
 "parameters": {},
 "variables": {
+  "adminUsername": "azureuser",
   "apiVersion": "2015-06-15",
   "sshKeyPath": "[concat('/home/',variables('adminUsername'),'/.ssh/authorized_keys')]",
   "storageAccountName": "[concat(variables('vmName'), uniqueString(resourceGroup().id))]" 

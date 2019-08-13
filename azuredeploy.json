@@ -291,7 +291,7 @@
           "routerExtIP": "[reference(resourceId('Microsoft.Network/publicIPAddresses', variables('infrapipname'))).ipAddress]",
           "numberOfNodes": "[variables('numberOfNodes')]",
           "numberOfMasterNodes": "[variables('numberOfMasterNodes')]",
-          "numberOfInfraNodes": "[variables('numberOfinfrasndes')]"
+          "numberOfInfraNodes": "[variables('numberOfInfraNodes')]"
           }
         }
       },

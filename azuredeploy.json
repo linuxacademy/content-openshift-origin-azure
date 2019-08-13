@@ -335,7 +335,7 @@
       "apiVersion": "2013-03-01",
       "copy": {
         "name": "infraLoop",
-        "count": "[variables('numberOfinfrasndes')]"
+        "count": "[variables('numberOfInfraNodes')]"
       },
       "dependsOn": [
         "[concat('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'))]",

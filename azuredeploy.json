@@ -45,8 +45,6 @@
     "mastersubnetPrefix": "10.41.0.0/24",
     "masterpipname": "masterPip",
     "masterppipaddresstype": "Dynamic",
-    "masterlbName": "masterLB",
-    "masterlbid": "[resourceId('Microsoft.Network/loadBalancers', variables('masterlbName'))]",
     "masterASName": "masterAS",
     "apiVersion": "2015-06-15",
     "infranodeStorageName": "[concat(uniqueString(resourceGroup().id), 'infranodesa')]",
@@ -267,7 +265,6 @@
       "apiVersion": "2013-03-01",
       "dependsOn": [
         "[concat('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'))]",
-        "[variables('masterlbid')]",
         "[resourceId('Microsoft.Resources/deployments', 'master0')]",
         "[resourceId('Microsoft.Resources/deployments', 'infranode0')]",
         "[resourceId('Microsoft.Resources/deployments', 'node0')]"
@@ -305,8 +302,7 @@
       },
       "dependsOn": [
         "[concat('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'))]",
-        "[resourceId('Microsoft.Compute/availabilitySets', variables('masterASName'))]",
-        "[variables('masterlbid')]"
+        "[resourceId('Microsoft.Compute/availabilitySets', variables('masterASName'))]"
       ],
       "properties": {
         "mode": "Incremental",
@@ -324,8 +320,7 @@
           "sshKeyData": "[variables('sshKeyData')]",
           "baseTemplateUrl": "[variables('baseTemplateUrl')]",
           "imageReference": "[variables(variables('image'))]",
-          "ASName": "[variables('masterASName')]",
-          "backEndAddressPool": "[concat(variables('masterlbid'), '/backendAddressPools/BackendPool')]"
+          "ASName": "[variables('masterASName')]"
           }
         }
       },

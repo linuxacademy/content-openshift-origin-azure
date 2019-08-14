@@ -18,7 +18,7 @@
 			"value": "managed"
 		},
 		"openshiftClusterPrefix": {
-			"value": "changeme"
+			"value": "mycluster"
 		},
 		"masterInstanceCount": {
 			"value": 3
@@ -27,49 +27,49 @@
 			"value": 3
 		},
 		"nodeInstanceCount": {
-			"value": 3
+			"value": 2
 		},
 		"dataDiskSize": {
 			"value": 128
 		},
 		"adminUsername": {
-			"value": "changeme"
+			"value": "azureuser"
 		},
 		"openshiftPassword": {
-			"value": "changeme"
+			"value": "ThisIsYourSampleSecret!ShouldStayLocal!"
 		},
 		"enableMetrics": {
-			"value": "false"
+			"value": "true"
 		},
 		"enableLogging": {
 			"value": "false"
 		},
 		"sshPublicKey": {
-			"value": "changeme"
+			"value": "ssh-rsa AAAAB3...Public...Key...You...Created...In...Prep...Steps...swXg5szN"
 		},
 		"keyVaultResourceGroup": {
-			"value": "changeme"
+			"value": "OpenShiftRG1"
 		},
 		"keyVaultName": {
-			"value": "changeme"
+			"value": "OpenShiftKV"
 		},
 		"keyVaultSecret": {
-			"value": "changeme"
+			"value": "OpenShiftPK1"
 		},
 		"enableAzure": {
 			"value": "true"
 		},
 		"aadClientId": {
-			"value": "changeme"
+			"value": "ThisIsYourAzureADServicePrincipalClientID"
 		},
 		"aadClientSecret": {
-			"value": "changeme"
+			"value": "ThisIsYourAzureADServicePrincipalClientSecret"
 		},
 		"defaultSubDomainType": {
 			"value": "nipio"
 		},
 		"defaultSubDomain": {
-			"value": "changeme"
+			"value": "domain-name-all-lowercase-if-custom-used.com"
 		}
 	}
 }

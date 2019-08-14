@@ -3,58 +3,58 @@
 	"contentVersion": "1.0.0.0",
 	"parameters": {
 		"_artifactsLocation": {
-			"value": "https://raw.githubusercontent.com/Microsoft/openshift-origin/master"
+			"value": "https://raw.githubusercontent.com/linuxacademy/content-openshift-origin-azure/master"
 		},
 		"masterVmSize": {
-			"value": "Standard_D4s_v3"
+			"value": "Standard_B2ms"
 		},
 		"infraVmSize": {
-			"value": "Standard_D4s_v3"
+			"value": "Standard_B2ms"
 		},
 		"nodeVmSize": {
-			"value": "Standard_D4s_v3"
+			"value": "Standard_B2ms"
 		},
 		"storageKind": {
 			"value": "managed"
 		},
 		"openshiftClusterPrefix": {
-			"value": "changeme"
+			"value": "master"
 		},
 		"masterInstanceCount": {
-			"value": 3
+			"value": 1
 		},
 		"infraInstanceCount": {
-			"value": 3
+			"value": 1
 		},
 		"nodeInstanceCount": {
-			"value": 3
+			"value": 1
 		},
 		"dataDiskSize": {
-			"value": 128
+			"value": 64
 		},
 		"adminUsername": {
-			"value": "changeme"
+			"value": "azureuser"
 		},
 		"openshiftPassword": {
-			"value": "changeme"
+			"value": "LabLA123!"
 		},
 		"enableMetrics": {
 			"value": "false"
 		},
 		"enableLogging": {
-			"value": "false"
+			"value": "true"
 		},
 		"sshPublicKey": {
-			"value": "changeme"
+			"value": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDd8zJGEa3pLi74Bb0Bwe3o383i9jByQIQDcZ0Tmh5TLJUfmlRD0oJtBQNwUR3pQkownjzFRycLSaOrkowp2rLgANtyS8dixSAdkiRa7QvlZOvjiO+/ECBnZs+KEFwrgTcZ/XHOUq2hbXywb5/4z77hODpmoEipK6g0n5S2NPZJDUzv9tXZV1vd/eGp8kZphvEDilB+3dBKFlFh3RJSdMj2sPsM6pOEeeSp1YXS6nmDHXqsoyKJ1Pk+nfitWNsQI+UEYqAS9xh9KvjKCyKtJ+AkQqoEYb3WlYWdA/BX4FOEaa71yg+OXrK4GYt5/BkxahifNl7RyvLz2NJ3SocfgIYH"
 		},
 		"keyVaultResourceGroup": {
-			"value": "changeme"
+			"value": "1-6a5b50-playground-sandbox"
 		},
 		"keyVaultName": {
-			"value": "changeme"
+			"value": "keyvaultOKD"
 		},
 		"keyVaultSecret": {
-			"value": "changeme"
+			"value": "~/.ssh/openshift_rsa"
 		},
 		"enableAzure": {
 			"value": "true"
@@ -69,7 +69,7 @@
 			"value": "nipio"
 		},
 		"defaultSubDomain": {
-			"value": "changeme"
+			"value": "okdlinuxacademy.nip.io"
 		}
 	}
 }

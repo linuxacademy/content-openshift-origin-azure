@@ -13,7 +13,6 @@
   "subnetName": "jumpBoxSubnet",
   "virtualNetworkName": "openshiftVnet",
   "imageReference": "centos",
-  "fqdn": "[reference(variables('masterpipname')).dnsSettings.fqdn]",
   "routerExtIP": "[reference(resourceId('Microsoft.Network/publicIPAddresses', variables('infrapipname'))).ipAddress]",
   "infrapipname": "infraPip",
   "numberOfNodes": 1,

@@ -1,5 +1,8 @@
 #!/bin/bash
 
+USERNAME=azureuser
+PASSWORD=azureuser
+
 echo $(date) " - Starting Script"
 
 # Install EPEL repository
@@ -15,9 +18,15 @@ echo $(date) " - Update system to latest packages and install dependencies"
 
 yum -y install wget git net-tools bind-utils iptables-services bridge-utils bash-completion kexec-tools sos psacct httpd-tools
 yum -y update
-systemctl restart dbus
 
 echo $(date) " - System updates successfully installed"
+
+echo $(date) " - Setting up htpasswd as OpenShift Auth Provider"
+
+mkdir -p /etc/origin/master
+htpasswd -cb /etc/origin/master/htpasswd ${USERNAME} ${PASSWORD}
+
+echo $(date) " - Setup of htpasswd successfully"
 
 # Only install Ansible and pyOpenSSL on Master-0 Node
 # python-passlib needed for metrics

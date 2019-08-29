@@ -1,0 +1,620 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json",
+    "contentVersion": "1.0.0.0",
+    "parameters": {},
+    "variables": {
+
+        "_artifactsLocation": "https://raw.githubusercontent.com/Microsoft/openshift-origin/master",
+		"nodePrepScriptUrl": "[concat(variables('_artifactsLocation'), '/scripts/nodePrep.sh')]",
+		"masterPrepScriptUrl": "[concat(variables('_artifactsLocation'), '/scripts/masterPrep.sh')]",
+		"openshiftDeploymentScriptUrl": "[concat(variables('_artifactsLocation'), '/scripts/deployOpenShift.sh')]",
+		"nodePrepScriptFileName": "nodePrep.sh",
+		"masterPrepScriptFileName": "masterPrep.sh",
+		"openshiftDeploymentScriptFileName": "deployOpenShift.sh",
+		"clusterNodeDeploymentTemplateUrl": "[concat(variables('_artifactsLocation'), '/nested/clusternode.json')]",
+		"openshiftDeploymentTemplateUrl": "[concat(variables('_artifactsLocation'), '/nested/openshiftdeploy.json')]",
+
+
+        "adminUserName": "azureuser",
+        "sshKeyData": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDqSNF0x69M598PLh7O1GXg968262Lu0lBnzimZ5Bv2ugwaYv3Cti4/Gkh+dbz39HJlGouwnPV5pGA0bO9lZ6cD0UrDjyqnPatoZ6fyIhMwIPufqrXJlHttu6Bwh1wfATCl3LBsGAWhZwH4mERXXtSeBRRmDUeTKDZaMUIFvMOFdWgMJWhoQxnWOxPzwxZfUt9EzxzcKzb6xkrZLR7Zn3gk0kPXCIll/94JJt5u19T6PEFDRpwOhMdeO3+BgBw1KMiA8O2rq2xiZwP5kZuH6m3OrgpwSio7/iCUYXlK3SmDUi3Z2d2BNPuMHZlaXDLlSGYfR/mJhwptPwvFJ8B7m0t/",
+        "sshKeyPath": "[concat('/home/', variables('adminUsername'),'/.ssh/authorized_keys')]",
+        "storageAccountName": "[toLower( concat( 'azurelalab', uniqueString(resourceGroup().id) ))]",
+        "storeageAccountpersistentVolume1": "[concat('pv1sa', uniqueString(concat(resourceGroup().id, 'persistentvolume1')))]",
+        "networkSecurityGroupName": "shared-nsg",
+		"imageRef": {
+			"publisher": "Openlogic",
+			"offer": "CentOS",
+			"sku": "7.5",
+			"version": "latest"
+		},
+        "vNet1": {
+            "name": "openshift-vnet",
+            "addressSpacePrefix": "10.10.0.0/16",
+            "masterSubnet": "master-subnet",
+            "masterSubnetPrefix": "10.10.1.0/24",
+            "infraSubnet": "infra-subnet",
+            "infraSubnetPrefix": "10.10.2.0/24",
+            "appnodeSubnet": "appnode-subnet",
+            "appnodeSubnetPrefix": "10.10.3.0/24"
+        },
+        "masterVM": {
+            "name": "masterVM-0",
+            "vmSize": "Standard_B1ms",
+            "dataDiskSize": 32,
+            "nicName": "masterVM-nic1",
+            "pubIpName": "masterVM-pip1",
+            "pubIpType": "Dynamic"
+        },
+        "infraVM": {
+            "name": "infraVM-0",
+            "vmSize": "Standard_B1ms",
+            "dataDiskSize": 32,
+            "nicName": "infraVM-nic1",
+            "pubIpName": "infraVM-pip1",
+            "pubIpType": "Dynamic"
+        },
+        "appnodeVM": {
+            "name": "appnodeVM-0",
+            "vmSize": "Standard_B1ms",
+            "dataDiskSize": 32,
+            "nicName": "appnodeVM-nic1",
+            "pubIpName": "appnodeVM-pip1",
+            "pubIpType": "Dynamic"
+        } ,
+        "bastionVM": {
+            "name": "bastionVM-0",
+            "vmSize": "Standard_B1ms",
+            "nicName": "bastionVM-nic1",
+            "pubIpName": "bastionVM-pip1",
+            "pubIpType": "Dynamic"
+        }
+    },
+    "resources": [
+        {
+            "apiVersion": "2016-03-30",
+            "type": "Microsoft.Network/virtualNetworks",
+            "name": "[variables('vNet1').name]",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+                "[concat('Microsoft.Network/networkSecurityGroups/', variables('networkSecurityGroupName'))]"
+            ],
+            "properties": {
+                "addressSpace": {
+                    "addressPrefixes": [
+                        "[variables('vNet1').addressSpacePrefix]"
+                    ]
+                },
+                "subnets": [
+                    {
+                        "name": "[variables('vNet1').masterSubnet]",
+                        "properties": {
+                            "addressPrefix": "[variables('vNet1').masterSubnetPrefix]",
+                            "networkSecurityGroup": {
+                                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('networkSecurityGroupName'))]"
+                            }
+                        }
+                    },
+                    {
+                        "name": "[variables('vNet1').infraSubnet]",
+                        "properties": {
+                            "addressPrefix": "[variables('vNet1').infraSubnetPrefix]",
+                            "networkSecurityGroup": {
+                                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('networkSecurityGroupName'))]"
+                            }
+                        }
+                    },
+                    {
+                        "name": "[variables('vNet1').appnodeSubnet]",
+                        "properties": {
+                            "addressPrefix": "[variables('vNet1').appnodeSubnetPrefix]",
+                            "networkSecurityGroup": {
+                                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('networkSecurityGroupName'))]"
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts",
+            "name": "[variables('storageAccountName')]",
+            "apiVersion": "2017-06-01",
+            "location": "[resourceGroup().location]",
+            "sku": {
+              "name": "Standard_LRS"
+            },
+            "kind": "Storage",
+            "properties": {}
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts",
+            "name": "[variables('storeageAccountpersistentVolume1')]",
+            "apiVersion": "2017-06-01",
+            "location": "[resourceGroup().location]",
+            "sku": {
+              "name": "Standard_LRS"
+            },
+            "kind": "Storage",
+            "properties": {}
+        },
+        {
+            "apiVersion": "2017-06-01",
+            "type": "Microsoft.Network/publicIPAddresses",
+            "name": "[variables('masterVM').pubIpName]",
+            "location": "[resourceGroup().location]",
+            "properties": {
+              "publicIPAllocationMethod": "[variables('masterVM').pubIpType]"
+            }
+        },
+        {
+            "apiVersion": "2017-06-01",
+            "type": "Microsoft.Network/publicIPAddresses",
+            "name": "[variables('infraVM').pubIpName]",
+            "location": "[resourceGroup().location]",
+            "properties": {
+              "publicIPAllocationMethod": "[variables('infraVM').pubIpType]"
+            }
+        },
+        {
+            "apiVersion": "2017-06-01",
+            "type": "Microsoft.Network/publicIPAddresses",
+            "name": "[variables('appnodeVM').pubIpName]",
+            "location": "[resourceGroup().location]",
+            "properties": {
+              "publicIPAllocationMethod": "[variables('appnodeVM').pubIpType]"
+            }
+        },
+        {
+            "apiVersion": "2017-06-01",
+            "type": "Microsoft.Network/publicIPAddresses",
+            "name": "[variables('bastionVM').pubIpName]",
+            "location": "[resourceGroup().location]",
+            "properties": {
+              "publicIPAllocationMethod": "[variables('bastionVM').pubIpType]"
+            }
+        },
+
+        {
+            "apiVersion": "2015-06-15",
+            "type": "Microsoft.Network/networkSecurityGroups",
+            "name": "[variables('networkSecurityGroupName')]",
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "securityRules": [
+                    {
+                        "name": "in_allow_ssh",
+                        "properties": {
+                            "description": "Allow SSH default port 22.",
+                            "protocol": "Tcp",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "22",
+                            "sourceAddressPrefix": "*",
+                            "destinationAddressPrefix": "*",
+                            "access": "Allow",
+                            "priority": 1100,
+                            "direction": "Inbound"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "apiVersion": "2017-06-01",
+            "type": "Microsoft.Network/networkInterfaces",
+            "name": "[variables('masterVM').nicName]",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+              "[resourceId('Microsoft.Network/publicIPAddresses/', variables('masterVM').pubIpName)]",
+              "[resourceId('Microsoft.Network/virtualNetworks/', variables('vnet1').name)]"
+            ],
+            "properties": {
+              "ipConfigurations": [
+                {
+                  "name": "ipconfig1",
+                  "properties": {
+                    "privateIPAllocationMethod": "Dynamic",
+                    "publicIPAddress": {
+                      "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('masterVM').pubIpName)]"
+                    },
+                    "subnet": {
+                      "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vnet1').name, variables('vnet1').masterSubnet)]"
+                    }
+                  }
+                }
+              ]
+            }
+        },
+        {
+            "apiVersion": "2017-06-01",
+            "type": "Microsoft.Network/networkInterfaces",
+            "name": "[variables('infraVM').nicName]",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+              "[resourceId('Microsoft.Network/publicIPAddresses/', variables('infraVM').pubIpName)]",
+              "[resourceId('Microsoft.Network/virtualNetworks/', variables('vnet1').name)]"
+            ],
+            "properties": {
+              "ipConfigurations": [
+                {
+                  "name": "ipconfig1",
+                  "properties": {
+                    "privateIPAllocationMethod": "Dynamic",
+                    "publicIPAddress": {
+                      "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('infraVM').pubIpName)]"
+                    },
+                    "subnet": {
+                      "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vnet1').name, variables('vnet1').infraSubnet)]"
+                    }
+                  }
+                }
+              ]
+            }
+        },
+        {
+            "apiVersion": "2017-06-01",
+            "type": "Microsoft.Network/networkInterfaces",
+            "name": "[variables('appnodeVM').nicName]",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+              "[resourceId('Microsoft.Network/publicIPAddresses/', variables('appnodeVM').pubIpName)]",
+              "[resourceId('Microsoft.Network/virtualNetworks/', variables('vnet1').name)]"
+            ],
+            "properties": {
+              "ipConfigurations": [
+                {
+                  "name": "ipconfig1",
+                  "properties": {
+                    "privateIPAllocationMethod": "Dynamic",
+                    "publicIPAddress": {
+                      "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('appnodeVM').pubIpName)]"
+                    },
+                    "subnet": {
+                      "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vnet1').name, variables('vnet1').appnodeSubnet)]"
+                    }
+                  }
+                }
+              ]
+            }
+        },
+        {
+            "apiVersion": "2017-06-01",
+            "type": "Microsoft.Network/networkInterfaces",
+            "name": "[variables('bastionVM').nicName]",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+              "[resourceId('Microsoft.Network/publicIPAddresses/', variables('bastionVM').pubIpName)]",
+              "[resourceId('Microsoft.Network/virtualNetworks/', variables('vnet1').name)]"
+            ],
+            "properties": {
+              "ipConfigurations": [
+                {
+                  "name": "ipconfig1",
+                  "properties": {
+                    "privateIPAllocationMethod": "Dynamic",
+                    "publicIPAddress": {
+                      "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('bastionVM').pubIpName)]"
+                    },
+                    "subnet": {
+                      "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vnet1').name, variables('vnet1').infraSubnet)]"
+                    }
+                  }
+                }
+              ]
+            }
+        },
+
+        {
+            "apiVersion": "2017-03-30",
+            "type": "Microsoft.Compute/virtualMachines",
+            "name": "[variables('masterVM').name]",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+              "[resourceId('Microsoft.Storage/storageAccounts/', variables('storageAccountName'))]",
+              "[resourceId('Microsoft.Network/networkInterfaces/', variables('masterVM').nicName)]"
+            ],
+            "properties": {
+              "hardwareProfile": {
+                "vmSize": "[variables('masterVM').vmSize]"
+              },
+              "osProfile": {
+                "computerName": "[variables('masterVM').name]",
+                "adminUsername": "[variables('adminUsername')]",
+                "linuxConfiguration": {
+                    "disablePasswordAuthentication": true,
+                    "ssh": {
+                        "publicKeys": [
+                        {
+                            "path": "[variables('sshKeyPath')]",
+                            "keyData": "[variables('sshKeyData')]"
+                        }
+                        ]
+                    }
+                }
+              },
+              "storageProfile": {
+                "imageReference": {
+                  "publisher": "[variables('imageRef').publisher]",
+                  "offer": "[variables('imageRef').offer]",
+                  "sku": "[variables('imageRef').sku]",
+                  "version": "[variables('imageRef').version]"
+                },
+                "osDisk": {
+                  "createOption": "FromImage"
+                },
+                "dataDisks": [
+                    {
+                        "diskSizeGB": "[variables('masterVM').dataDiskSize]",
+                        "lun": 0,
+                        "createOption": "Empty"
+                    }
+                ]
+              },
+              "networkProfile": {
+                "networkInterfaces": [
+                  {
+                    "id": "[resourceId('Microsoft.Network/networkInterfaces',variables('masterVM').nicName)]"
+                  }
+                ]
+              },
+              "diagnosticsProfile": {
+                "bootDiagnostics": {
+                  "enabled": true,
+                  "storageUri": "[concat(reference(concat('Microsoft.Storage/storageAccounts/', variables('storageAccountName')), '2016-01-01').primaryEndpoints.blob)]"
+                }
+              }
+            }
+          },
+          {
+            "apiVersion": "2017-03-30",
+            "type": "Microsoft.Compute/virtualMachines",
+            "name": "[variables('infraVM').name]",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+              "[resourceId('Microsoft.Storage/storageAccounts/', variables('storageAccountName'))]",
+              "[resourceId('Microsoft.Network/networkInterfaces/', variables('infraVM').nicName)]"
+            ],
+            "properties": {
+              "hardwareProfile": {
+                "vmSize": "[variables('infraVM').vmSize]"
+              },
+              "osProfile": {
+                "computerName": "[variables('infraVM').name]",
+                "adminUsername": "[variables('adminUsername')]",
+                "linuxConfiguration": {
+                    "disablePasswordAuthentication": true,
+                    "ssh": {
+                        "publicKeys": [
+                        {
+                            "path": "[variables('sshKeyPath')]",
+                            "keyData": "[variables('sshKeyData')]"
+                        }
+                        ]
+                    }
+                }
+              },
+              "storageProfile": {
+                "imageReference": {
+                    "publisher": "[variables('imageRef').publisher]",
+                    "offer": "[variables('imageRef').offer]",
+                    "sku": "[variables('imageRef').sku]",
+                    "version": "[variables('imageRef').version]"
+                },
+                "osDisk": {
+                  "createOption": "FromImage"
+                },
+                "dataDisks": [
+                    {
+                        "diskSizeGB": "[variables('infraVM').dataDiskSize]",
+                        "lun": 0,
+                        "createOption": "Empty"
+                    }
+                ]
+              },
+              "networkProfile": {
+                "networkInterfaces": [
+                  {
+                    "id": "[resourceId('Microsoft.Network/networkInterfaces',variables('infraVM').nicName)]"
+                  }
+                ]
+              },
+              "diagnosticsProfile": {
+                "bootDiagnostics": {
+                  "enabled": true,
+                  "storageUri": "[concat(reference(concat('Microsoft.Storage/storageAccounts/', variables('storageAccountName')), '2016-01-01').primaryEndpoints.blob)]"
+                }
+              }
+            }
+          },
+
+          {
+            "apiVersion": "2017-03-30",
+            "type": "Microsoft.Compute/virtualMachines",
+            "name": "[variables('appnodeVM').name]",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+              "[resourceId('Microsoft.Storage/storageAccounts/', variables('storageAccountName'))]",
+              "[resourceId('Microsoft.Network/networkInterfaces/', variables('appnodeVM').nicName)]"
+            ],
+            "properties": {
+              "hardwareProfile": {
+                "vmSize": "[variables('appnodeVM').vmSize]"
+              },
+              "osProfile": {
+                "computerName": "[variables('appnodeVM').name]",
+                "adminUsername": "[variables('adminUsername')]",
+                "linuxConfiguration": {
+                    "disablePasswordAuthentication": true,
+                    "ssh": {
+                        "publicKeys": [
+                        {
+                            "path": "[variables('sshKeyPath')]",
+                            "keyData": "[variables('sshKeyData')]"
+                        }
+                        ]
+                    }
+                }
+              },
+              "storageProfile": {
+                "imageReference": {
+                    "publisher": "[variables('imageRef').publisher]",
+                    "offer": "[variables('imageRef').offer]",
+                    "sku": "[variables('imageRef').sku]",
+                    "version": "[variables('imageRef').version]"
+                },
+                "osDisk": {
+                  "createOption": "FromImage"
+                },
+                "dataDisks": [
+                    {
+                        "diskSizeGB": "[variables('appnodeVM').dataDiskSize]",
+                        "lun": 0,
+                        "createOption": "Empty"
+                    }
+                ]
+              },
+              "networkProfile": {
+                "networkInterfaces": [
+                  {
+                    "id": "[resourceId('Microsoft.Network/networkInterfaces',variables('appnodeVM').nicName)]"
+                  }
+                ]
+              },
+              "diagnosticsProfile": {
+                "bootDiagnostics": {
+                  "enabled": true,
+                  "storageUri": "[concat(reference(concat('Microsoft.Storage/storageAccounts/', variables('storageAccountName')), '2016-01-01').primaryEndpoints.blob)]"
+                }
+              }
+            }
+          },
+          {
+            "apiVersion": "2017-03-30",
+            "type": "Microsoft.Compute/virtualMachines",
+            "name": "[variables('bastionVM').name]",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+              "[resourceId('Microsoft.Storage/storageAccounts/', variables('storageAccountName'))]",
+              "[resourceId('Microsoft.Network/networkInterfaces/', variables('bastionVM').nicName)]"
+            ],
+            "properties": {
+              "hardwareProfile": {
+                "vmSize": "[variables('bastionVM').vmSize]"
+              },
+              "osProfile": {
+                "computerName": "[variables('bastionVM').name]",
+                "adminUsername": "[variables('adminUsername')]",
+                "linuxConfiguration": {
+                    "disablePasswordAuthentication": true,
+                    "ssh": {
+                        "publicKeys": [
+                        {
+                            "path": "[variables('sshKeyPath')]",
+                            "keyData": "[variables('sshKeyData')]"
+                        }
+                        ]
+                    }
+                }
+              },
+              "storageProfile": {
+                "imageReference": {
+                    "publisher": "[variables('imageRef').publisher]",
+                    "offer": "[variables('imageRef').offer]",
+                    "sku": "[variables('imageRef').sku]",
+                    "version": "[variables('imageRef').version]"
+                },
+                "osDisk": {
+                  "createOption": "FromImage"
+                }
+              },
+              "networkProfile": {
+                "networkInterfaces": [
+                  {
+                    "id": "[resourceId('Microsoft.Network/networkInterfaces',variables('bastionVM').nicName)]"
+                  }
+                ]
+              },
+              "diagnosticsProfile": {
+                "bootDiagnostics": {
+                  "enabled": true,
+                  "storageUri": "[concat(reference(concat('Microsoft.Storage/storageAccounts/', variables('storageAccountName')), '2016-01-01').primaryEndpoints.blob)]"
+                }
+              }
+            }
+          },
+
+
+
+          {
+			"type": "Microsoft.Compute/virtualMachines/extensions",
+			"name": "[concat(variables('masterVM').name, '/deployOpenShift')]",
+            "location": "[resourceGroup().location]",
+			"apiVersion": "2017-03-30",
+			"dependsOn": [
+                "[concat('Microsoft.Compute/virtualMachines/',variables('masterVM').name)]"
+			],
+			"properties": {
+				"publisher": "Microsoft.Azure.Extensions",
+				"type": "CustomScript",
+				"typeHandlerVersion": "2.0",
+				"autoUpgradeMinorVersion": true,
+				"settings": {
+					"fileUris": [
+						"[variables('masterPrepScriptUrl')]"
+					]
+				},
+				"protectedSettings": {
+					"commandToExecute": "[concat('bash ', variables('masterPrepScriptFileName'), ' ', variables('storeageAccountpersistentVolume1'), ' ', variables('adminUserName'), ' ', resourcegroup().location)]"
+				}
+			}
+        },
+        {
+			"type": "Microsoft.Compute/virtualMachines/extensions",
+            "name": "[concat(variables('infraVM').name, '/prepNodes')]",
+            "location": "[resourceGroup().location]",
+			"apiVersion": "2017-03-30",
+			"dependsOn": [
+                "[concat('Microsoft.Compute/virtualMachines/',variables('infraVM').name)]"
+			],
+			"properties": {
+				"publisher": "Microsoft.Azure.Extensions",
+				"type": "CustomScript",
+				"typeHandlerVersion": "2.0",
+				"autoUpgradeMinorVersion": true,
+				"settings": {
+					"fileUris": [
+						"[variables('nodePrepScriptUrl')]"
+					]
+				},
+				"protectedSettings": {
+					"commandToExecute": "[concat('bash ', variables('nodePrepScriptFileName'))]"
+				}
+			}
+        },
+        {
+			"type": "Microsoft.Compute/virtualMachines/extensions",
+			"name": "[concat(variables('appnodeVM').name, '/prepNodes')]",
+            "location": "[resourceGroup().location]",
+			"apiVersion": "2017-03-30",
+			"dependsOn": [
+                "[concat('Microsoft.Compute/virtualMachines/',variables('appnodeVM').name)]"
+			],
+			"properties": {
+				"publisher": "Microsoft.Azure.Extensions",
+				"type": "CustomScript",
+				"typeHandlerVersion": "2.0",
+				"autoUpgradeMinorVersion": true,
+				"settings": {
+					"fileUris": [
+						"[variables('nodePrepScriptUrl')]"
+					]
+				},
+				"protectedSettings": {
+					"commandToExecute": "[concat('bash ', variables('nodePrepScriptFileName'))]"
+				}
+			}
+		}
+
+    ],
+    "outputs": {
+    }
+}

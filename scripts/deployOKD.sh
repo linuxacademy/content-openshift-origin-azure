@@ -76,3 +76,5 @@ EOF
 
 ansible-playbook /usr/share/ansible/openshift-ansible/playbook/prerequisites.yml
 ansible-playbook /usr/share/ansible/openshift-ansible/playbook/deploy_cluster.yml
+
+echo $(date) " - Script Complete"

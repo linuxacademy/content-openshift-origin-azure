@@ -18,6 +18,7 @@ yum -y install wget git net-tools bind-utils iptables-services bridge-utils bash
 
 echo $(date) " - System updates successfully installed"
 
+# Installation Ansible, pyOpenSSL and python-passlib
 echo $(date) " - Installing Ansible, pyOpenSSL and python-passlib"
 
 yum -y --enablerepo=epel install ansible openssl-devel python-devel
@@ -32,6 +33,7 @@ yum -y install docker
 
 echo $(date) " -  OKD packages, openshift-ansible, and dockersuccessfully installed"
 
+# Enabling Docker
 echo $(date) " - Enabling and starting docker"
 
 sed -i -e "s#^OPTIONS='--selinux-enabled'#OPTIONS='--selinux-enabled --insecure-registry 104.209.0.0/16'#" /etc/sysconfig/docker
@@ -40,6 +42,9 @@ systemctl enable docker
 systemctl start docker
 
 echo $(date) " - Docker started successfully"
+
+# Creating Inventory file
+echo $(date) " - Creating Inventory file"
 
 cat <<EOF > /etc/ansible/hosts
 [OSEv3:children]
@@ -75,7 +80,14 @@ appnodeVM-0 openshift_node_labels="{'region': 'primary', 'zone': 'default'}"
 infraVM-0 openshift_node_labels="{'region': 'infra', 'zone': 'default'}"
 EOF
 
+echo $(date) " - Inventory file created"
+
+#Running OpenShift installation playbooks
+echo $(date) " - Running OpenShift installation playbooks"
+
 ansible-playbook /usr/share/ansible/openshift-ansible/playbooks/prerequisites.yml
 ansible-playbook /usr/share/ansible/openshift-ansible/playbooks/deploy_cluster.yml
+
+echo $(date) " - OpenShift installation playbooks ran successfully"
 
 echo $(date) " - Script Complete"

@@ -14,34 +14,12 @@ echo $(date) " - EPEL successfully installed"
 echo $(date) " - Update system to latest packages and install dependencies"
 
 yum -y install wget git net-tools bind-utils iptables-services bridge-utils bash-completion kexec-tools sos psacct
-yum -y install cloud-utils-growpart.noarch
-yum -y update --exclude=WALinuxAgent
-systemctl restart dbus
+yum -y update
 
 echo $(date) " - System updates successfully installed"
 
-# Grow Root File System
-echo $(date) " - Grow Root FS"
-
-rootdev=`findmnt --target / -o SOURCE -n`
-rootdrivename=`lsblk -no pkname $rootdev`
-rootdrive="/dev/"$rootdrivename
-name=`lsblk  $rootdev -o NAME | tail -1`
-part_number=${name#*${rootdrivename}}
-
-growpart $rootdrive $part_number -u on
-xfs_growfs $rootdev
-
-if [ $? -eq 0 ]
-then
-    echo $(date) " - Root File System successfully extended"
-else
-    echo $(date) " - Root File System failed to be grown"
-	exit 20
-fi
-
-# Install Docker 1.13.x
-echo $(date) " - Installing Docker 1.13.x"
+# Install Docker
+echo $(date) " - Installing Docker
 
 yum -y install docker
 sed -i -e "s#^OPTIONS='--selinux-enabled'#OPTIONS='--selinux-enabled --insecure-registry 172.30.0.0/16'#" /etc/sysconfig/docker
@@ -70,4 +48,3 @@ systemctl enable docker
 systemctl start docker
 
 echo $(date) " - Script Complete"
-

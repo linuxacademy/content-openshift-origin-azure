@@ -1,7 +1,7 @@
 #!/bin/bash
 
-#yum -y update
-yum -y install wget git net-tools bind-utils iptables-services bridge-utils bash-completion httpd-tools
+#yum -y update©
+
 yum -y install epel-release
 sed -i -e "s/^enabled=1/enabled=0/" /etc/yum.repos.d/epel.repo
 yum -y --enablerepo=epel install ansible openssl-devel python-devel

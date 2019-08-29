@@ -46,7 +46,7 @@ echo $(date) " - Java installed successfully"
 echo $(date) " - Installing Docker"
 
 yum -y install docker
-sed -i -e "s#^OPTIONS='--selinux-enabled'#OPTIONS='--selinux-enabled --insecure-registry 172.30.0.0/16'#" /etc/sysconfig/docker
+sed -i -e "s#^OPTIONS='--selinux-enabled'#OPTIONS='--selinux-enabled --insecure-registry 104.209.0.0/16'#" /etc/sysconfig/docker
 
 echo $(date) " - Docker installed successfully"
 

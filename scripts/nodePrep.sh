@@ -5,7 +5,7 @@ echo $(date) " - Starting Script"
 # Install EPEL repository
 echo $(date) " - Installing EPEL"
 
-yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+yum -y install epel-release
 sed -i -e "s/^enabled=1/enabled=0/" /etc/yum.repos.d/epel.repo
 
 echo $(date) " - EPEL successfully installed"
@@ -18,11 +18,25 @@ yum -y update
 
 echo $(date) " - System updates successfully installed"
 
+# Only install Ansible and pyOpenSSL on Master-0 Node
+# python-passlib needed for metrics
+
+echo $(date) " - Installing Ansible, pyOpenSSL and python-passlib"
+yum -y --enablerepo=epel install pyOpenSSL python-passlib
+yum -y install https://releases.ansible.com/ansible/rpm/release/epel-7-x86_64/ansible-2.6.2-1.el7.ans.noarch.rpm
+
+# Install java to support metrics
+echo $(date) " - Installing Java"
+
+yum -y install java-1.8.0-openjdk-headless
+
+echo $(date) " - Java installed successfully"
+
 # Install Docker
 echo $(date) " - Installing Docker "
 
 yum -y install docker
-sed -i -e "s#^OPTIONS='--selinux-enabled'#OPTIONS='--selinux-enabled --insecure-registry 172.30.0.0/16'#" /etc/sysconfig/docker
+sed -i -e "s#^OPTIONS='--selinux-enabled'#OPTIONS='--selinux-enabled --insecure-registry 104.209.0.0/16'#" /etc/sysconfig/docker
 
 echo $(date) " - Docker installed successfully"
 

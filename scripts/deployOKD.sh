@@ -32,8 +32,13 @@ yum -y install docker
 
 echo $(date) " -  OKD packages, openshift-ansible, and dockersuccessfully installed"
 
+echo $(date) " - Enabling and starting docker"
+
 systemctl enable docker-cleanup
 systemctl enable docker
+systemctl start docker
+
+echo $(date) " - Docker started successfully"
 
 cat <<EOF > /etc/ansible/hosts
 [OSEv3:children]

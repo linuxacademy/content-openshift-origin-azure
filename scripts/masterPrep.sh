@@ -43,7 +43,7 @@ yum -y install java-1.8.0-openjdk-headless
 echo $(date) " - Java installed successfully"
 
 # Install Docker
-echo $(date) " - Installing Docker
+echo $(date) " - Installing Docker"
 
 yum -y install docker
 sed -i -e "s#^OPTIONS='--selinux-enabled'#OPTIONS='--selinux-enabled --insecure-registry 172.30.0.0/16'#" /etc/sysconfig/docker

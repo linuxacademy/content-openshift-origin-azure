@@ -26,7 +26,7 @@ echo $(date) " - Ansible, pyOpenSSL and python-passlib successfully installed"
 
 echo $(date) " - Installing OKD packages, openshift-ansible, and docker"
 
-yum -y install
+yum -y install centos-release-openshift-origin
 yum -y install openshift-ansible
 yum -y install docker
 

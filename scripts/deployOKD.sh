@@ -21,7 +21,7 @@ echo $(date) " - System updates successfully installed"
 # Installation Ansible, pyOpenSSL and python-passlib
 echo $(date) " - Installing Ansible, pyOpenSSL and python-passlib"
 
-yum -y --enablerepo=epel install ansible openssl-devel python-devel
+yum -y --enablerepo=epel install centos-release-ansible26 openssl-devel python-devel
 
 echo $(date) " - Ansible, pyOpenSSL and python-passlib successfully installed"
 

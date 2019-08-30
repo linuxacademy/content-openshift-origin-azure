@@ -36,7 +36,6 @@ echo $(date) " -  OKD packages, openshift-ansible, and dockersuccessfully instal
 # Enabling Docker
 echo $(date) " - Enabling and starting docker"
 
-sed -i -e "s#^OPTIONS='--selinux-enabled'#OPTIONS='--selinux-enabled --insecure-registry 104.209.0.0/16'#" /etc/sysconfig/docker
 systemctl enable docker-cleanup
 systemctl enable docker
 systemctl start docker

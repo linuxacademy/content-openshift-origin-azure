@@ -27,7 +27,7 @@ echo $(date) " - Ansible, pyOpenSSL and python-passlib successfully installed"
 
 echo $(date) " - Installing OKD packages, openshift-ansible, and docker"
 
-yum -y install centos-release-openshift-origin39
+yum -y install centos-release-openshift-origin
 yum -y install openshift-ansible
 yum -y install docker
 
@@ -56,7 +56,7 @@ ansible_become=yes
 debug_level=2
 openshift_deployment_type=origin
 
-openshift_master_identity_providers=[{'name': 'htpasswd_auth', 'login': 'true', 'challenge': 'true', 'kind': 'HTPasswdPasswordIdentityProvider', 'filename': '/etc/origin/master/htpasswd'}]
+openshift_master_identity_providers=[{'name': 'htpasswd_auth', 'login': 'true', 'challenge': 'true', 'kind': 'HTPasswdPasswordIdentityProvider'}]
 
 openshift_master_cluster_method=native
 openshift_master_cluster_hostname=okd.masterVM-0.xip.io
@@ -74,9 +74,9 @@ masterVM-0
 masterVM-0
 
 [nodes]
-masterVM-0
-appnodeVM-0 openshift_node_labels="{'region': 'primary', 'zone': 'default'}"
-infraVM-0 openshift_node_labels="{'region': 'infra', 'zone': 'default'}"
+masterVM-0 openshift_node_group_name='node-config-master'
+appnodeVM-0 openshift_node_group_name='node-config-compute'
+infraVM-0 openshift_node_group_name='node-config-infra'
 EOF
 
 echo $(date) " - Inventory file created"

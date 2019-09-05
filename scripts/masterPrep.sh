@@ -13,6 +13,21 @@ sed -i -e "s/^enabled=1/enabled=0/" /etc/yum.repos.d/epel.repo
 
 echo $(date) " - EPEL successfully installed"
 
+cat <<EOF > /etc/sysconfig/network-scripts/ifcfg-eth0
+DEVICE=eth0
+ONBOOT=yes
+BOOTPROTO=dhcp
+TYPE=Ethernet
+USERCTL=no
+PEERDNS=yes
+IPV6INIT=no
+NM_CONTROLLED=yes
+PERSISTENT_DHCLIENT=yes
+DHCP_HOSTNAME=masterVM-0
+EOF
+
+echo $(date) " - Changed interface setting to NM_CONTROLLED=yes "
+
 echo $(date) " - Adding entries to host file"
 
 echo "10.10.2.4 bastionVM-0 bastion.example.xip.io" >> /etc/hosts

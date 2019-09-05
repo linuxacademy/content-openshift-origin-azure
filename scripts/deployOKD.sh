@@ -43,6 +43,23 @@ systemctl start docker
 
 echo $(date) " - Docker started successfully"
 
+echo $(date) " - Changing interface setting to NM_CONTROLLED=yes "
+
+cat <<EOF > /etc/sysconfig/network-scripts/ifcfg-eth0
+DEVICE=eth0
+ONBOOT=yes
+BOOTPROTO=dhcp
+TYPE=Ethernet
+USERCTL=no
+PEERDNS=yes
+IPV6INIT=no
+NM_CONTROLLED=yes
+PERSISTENT_DHCLIENT=yes
+DHCP_HOSTNAME=bastionVM-0
+EOF
+
+echo $(date) " - Changed interface setting to NM_CONTROLLED=yes "
+
 echo $(date) " - Adding entries to host file"
 
 echo "10.10.2.4 bastionVM-0 bastion.example.xip.io" >> /etc/hosts

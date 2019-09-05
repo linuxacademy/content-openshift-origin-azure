@@ -20,7 +20,7 @@ PEERDNS=yes
 IPV6INIT=no
 NM_CONTROLLED=yes
 PERSISTENT_DHCLIENT=yes
-DHCP_HOSTNAME=appnodeVM-0
+DHCP_HOSTNAME=infraVM-0
 EOF
 
 echo $(date) " - Changed interface setting to NM_CONTROLLED=yes "

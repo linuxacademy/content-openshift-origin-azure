@@ -13,6 +13,15 @@ sed -i -e "s/^enabled=1/enabled=0/" /etc/yum.repos.d/epel.repo
 
 echo $(date) " - EPEL successfully installed"
 
+echo $(date) " - Adding entries to host file"
+
+echo "10.10.2.4 bastionVM-0 bastion.example.xip.io" >> /etc/hosts
+echo "10.10.1.4 masterVM-0  master.example.xip.io   okd.master.example.xip.io" >> /etc/hosts
+echo "10.10.2.5 infraVM-0   infra.example.xip.io    apps.okd.infra.example.xip.io" >> /etc/hosts
+echo "10.10.3.4 appnodeVM-0 node.example.xip.io" >> /etc/hosts
+
+echo $(date) " -Entries added to host file"
+
 # Update system to latest packages and install dependencies
 echo $(date) " - Update system to latest packages and install dependencies"
 
@@ -46,6 +55,7 @@ echo $(date) " - Java installed successfully"
 echo $(date) " - Installing Docker"
 
 yum -y install docker
+sed -i -e "s#^OPTIONS='--selinux-enabled'#OPTIONS='--selinux-enabled --insecure-registry 172.30.0.0/16'#" /etc/sysconfig/docker
 
 echo $(date) " - Docker installed successfully"
 

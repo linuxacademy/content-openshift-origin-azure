@@ -8,13 +8,11 @@
         "infraPrepScriptUrl": "[concat(variables('_artifactsLocation'), '/scripts/infraPrep.sh')]",
 		    "masterPrepScriptUrl": "[concat(variables('_artifactsLocation'), '/scripts/masterPrep.sh')]",
         "bastionPrepScriptUrl": "[concat(variables('_artifactsLocation'), '/scripts/bastionPrep.sh')]",
-        "getSSHKeyScriptUrl": "[concat(variables('_artifactsLocation'), '/scripts/getSSHKey.sh')]",
 		    "openshiftDeploymentScriptUrl": "[concat(variables('_artifactsLocation'), '/scripts/deployOKD.sh')]",
 		    "nodePrepScriptFileName": "nodePrep.sh",
         "nodePrepScriptFileName": "nodePrep.sh",
 		    "masterPrepScriptFileName": "masterPrep.sh",
         "bastionPrepScriptFileName": "bastionPrep.sh",
-        "getSSHKeyScriptFileName": "getSSHKey.sh",
 		    "openshiftDeploymentScriptFileName": "deployOKD.sh",
         "adminUserName": "azureuser",
         "sshKeyData": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDqSNF0x69M598PLh7O1GXg968262Lu0lBnzimZ5Bv2ugwaYv3Cti4/Gkh+dbz39HJlGouwnPV5pGA0bO9lZ6cD0UrDjyqnPatoZ6fyIhMwIPufqrXJlHttu6Bwh1wfATCl3LBsGAWhZwH4mERXXtSeBRRmDUeTKDZaMUIFvMOFdWgMJWhoQxnWOxPzwxZfUt9EzxzcKzb6xkrZLR7Zn3gk0kPXCIll/94JJt5u19T6PEFDRpwOhMdeO3+BgBw1KMiA8O2rq2xiZwP5kZuH6m3OrgpwSio7/iCUYXlK3SmDUi3Z2d2BNPuMHZlaXDLlSGYfR/mJhwptPwvFJ8B7m0t/",
@@ -601,10 +599,36 @@
           },
 
 
-
+          {
+     "type": "Microsoft.Compute/virtualMachines/extensions",
+     "name": "[concat(variables('bastionVM').name, '/deployOKD')]",
+            "location": "[resourceGroup().location]",
+     "apiVersion": "2017-03-30",
+     "dependsOn": [
+                "[concat('Microsoft.Compute/virtualMachines/',variables('masterVM').name)]"
+     ],
+     "properties": {
+       "publisher": "Microsoft.Azure.Extensions",
+       "type": "CustomScript",
+       "typeHandlerVersion": "2.0",
+       "autoUpgradeMinorVersion": true,
+       "settings": {
+         "fileUris": [
+           "[variables('bastionPrepScriptUrl')]",
+           "[variables('openshiftDeploymentScriptUrl')]"
+         ]
+       },
+       "protectedSettings": {
+         "commandToExecute": "[concat('bash ', variables('bastionPrepScriptFileName'), ' ', variables('storeageAccountpersistentVolume1'), ' ', variables('adminUserName'), ' ', resourcegroup().location)]"
+       },
+       "protectedSettings": {
+         "commandToExecute": "[concat('bash ', variables('bastionPrepScriptFileName'), ' ', variables('storeageAccountpersistentVolume1'), ' ', variables('adminUserName'), ' ', resourcegroup().location)]"
+       }
+     }
+          },
           {
 			"type": "Microsoft.Compute/virtualMachines/extensions",
-			"name": "[concat(variables('masterVM').name, '/deployOpenShift')]",
+			"name": "[concat(variables('masterVM').name, '/prepMaster')]",
             "location": "[resourceGroup().location]",
 			"apiVersion": "2017-03-30",
 			"dependsOn": [
@@ -640,11 +664,11 @@
 				"autoUpgradeMinorVersion": true,
 				"settings": {
 					"fileUris": [
-						"[variables('nodePrepScriptUrl')]"
+						"[variables('infraPrepScriptUrl')]"
 					]
 				},
 				"protectedSettings": {
-					"commandToExecute": "[concat('bash ', variables('nodePrepScriptFileName'))]"
+					"commandToExecute": "[concat('bash ', variables('infraPrepScriptFileName'))]"
 				}
 			}
         },

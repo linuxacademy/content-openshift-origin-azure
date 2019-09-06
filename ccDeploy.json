@@ -9,12 +9,18 @@
         "storageAccountName": "[toLower( concat( 'azurelalab', uniqueString(resourceGroup().id) ))]",
         "storeageAccountpersistentVolume1": "[concat('pv1sa', uniqueString(concat(resourceGroup().id, 'persistentvolume1')))]",
         "networkSecurityGroupName": "shared-nsg",
-		"imageRef": {
-			"publisher": "Openlogic",
-			"offer": "CentOS",
-			"sku": "7.5",
-			"version": "latest"
-		},
+        "imageRef": {
+          "publisher": "Openlogic",
+          "offer": "CentOS",
+          "sku": "7.5",
+          "version": "latest"
+        },
+        "keyVault": {
+          "name": "[toLower( concat( 'lalabkv', uniqueString(resourceGroup().id) ))]",
+          "skuName": "standard",
+          "secretName": "sshKey",
+          "secretValue": "[variables('sshKeyData')]"
+        },
         "vNet1": {
             "name": "openshift-vnet",
             "addressSpacePrefix": "10.10.0.0/16",
@@ -31,7 +37,8 @@
             "dataDiskSize": 32,
             "nicName": "masterVM-nic1",
             "pubIpName": "masterVM-pip1",
-            "pubIpType": "Dynamic"
+            "pubIpType": "Dynamic",
+            "privateIp": "10.10.1.10"
         },
         "infraVM": {
             "name": "infraVM-0",
@@ -39,7 +46,8 @@
             "dataDiskSize": 32,
             "nicName": "infraVM-nic1",
             "pubIpName": "infraVM-pip1",
-            "pubIpType": "Dynamic"
+            "pubIpType": "Dynamic",
+            "privateIp": "10.10.1.11"
         },
         "appnodeVM": {
             "name": "appnodeVM-0",
@@ -47,17 +55,68 @@
             "dataDiskSize": 32,
             "nicName": "appnodeVM-nic1",
             "pubIpName": "appnodeVM-pip1",
-            "pubIpType": "Dynamic"
+            "pubIpType": "Dynamic",
+            "privateIp": "10.10.1.12"
         } ,
         "bastionVM": {
             "name": "bastionVM-0",
             "vmSize": "Standard_B1ms",
             "nicName": "bastionVM-nic1",
             "pubIpName": "bastionVM-pip1",
-            "pubIpType": "Dynamic"
+            "pubIpType": "Dynamic",
+            "privateIp": "10.10.1.13"
         }
     },
     "resources": [
+
+          {
+            "type": "Microsoft.KeyVault/vaults",
+            "name": "[variables('keyVault').name]",
+            "location": "[resourceGroup().location]",
+            "apiVersion": "2018-02-14",
+            "dependsOn": [
+              "[concat('Microsoft.Compute/virtualMachines/', variables('masterVM').name)]"
+            ],
+            "tags": {
+              "displayName": "KeyVault"
+            },
+            "properties": {
+              "tenantId": "[subscription().tenantId]",
+              "accessPolicies": [
+                {
+                  "objectId": "[reference(concat(resourceId('Microsoft.Compute/virtualMachines', variables('bastionVM').name), '/providers/Microsoft.ManagedIdentity/Identities/default'), '2018-11-30').principalId]",
+                  "tenantId": "[subscription().tenantId]",
+                  "permissions": {
+                    "secrets": [
+                      "all"
+                    ]
+                  }
+                }
+              ],
+              "sku": {
+                "name": "[variables('keyVault').skuName]",
+                "family": "A"
+              },
+              "networkAcls": {
+                "value": {
+                  "defaultAction": "Allow",
+                  "bypass": "AzureServices"
+                }
+              }
+            }
+          },
+          {
+            "type": "Microsoft.KeyVault/vaults/secrets",
+            "name": "[concat(variables('keyVault').name, '/', variables('keyVault').secretName)]",
+            "apiVersion": "2018-02-14",
+            "dependsOn": [
+              "[concat('Microsoft.KeyVault/vaults/', variables('keyVault').name)]"
+            ],
+            "properties": {
+              "value": "[variables('keyVault').secretValue]"
+            }
+          },
+
         {
             "apiVersion": "2016-03-30",
             "type": "Microsoft.Network/virtualNetworks",
@@ -200,7 +259,8 @@
                 {
                   "name": "ipconfig1",
                   "properties": {
-                    "privateIPAllocationMethod": "Dynamic",
+                    "privateIPAllocationMethod": "Static",
+                    "privateIPAddress": "[variables('masterVM').privateIp]",
                     "publicIPAddress": {
                       "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('masterVM').pubIpName)]"
                     },
@@ -226,12 +286,13 @@
                 {
                   "name": "ipconfig1",
                   "properties": {
-                    "privateIPAllocationMethod": "Dynamic",
+                    "privateIPAllocationMethod": "Static",
+                    "privateIPAddress": "[variables('infraVM').privateIp]",
                     "publicIPAddress": {
                       "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('infraVM').pubIpName)]"
                     },
                     "subnet": {
-                      "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vnet1').name, variables('vnet1').infraSubnet)]"
+                        "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vnet1').name, variables('vnet1').masterSubnet)]"
                     }
                   }
                 }
@@ -252,12 +313,13 @@
                 {
                   "name": "ipconfig1",
                   "properties": {
-                    "privateIPAllocationMethod": "Dynamic",
+                    "privateIPAllocationMethod": "Static",
+                    "privateIPAddress": "[variables('appnodeVM').privateIp]",
                     "publicIPAddress": {
                       "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('appnodeVM').pubIpName)]"
                     },
                     "subnet": {
-                      "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vnet1').name, variables('vnet1').appnodeSubnet)]"
+                        "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vnet1').name, variables('vnet1').masterSubnet)]"
                     }
                   }
                 }
@@ -278,12 +340,13 @@
                 {
                   "name": "ipconfig1",
                   "properties": {
-                    "privateIPAllocationMethod": "Dynamic",
+                    "privateIPAllocationMethod": "Static",
+                    "privateIPAddress": "[variables('bastionVM').privateIp]",
                     "publicIPAddress": {
                       "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('bastionVM').pubIpName)]"
                     },
                     "subnet": {
-                      "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vnet1').name, variables('vnet1').infraSubnet)]"
+                        "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vnet1').name, variables('vnet1').masterSubnet)]"
                     }
                   }
                 }
@@ -484,6 +547,9 @@
               "[resourceId('Microsoft.Storage/storageAccounts/', variables('storageAccountName'))]",
               "[resourceId('Microsoft.Network/networkInterfaces/', variables('bastionVM').nicName)]"
             ],
+            "identity": {
+              "type": "SystemAssigned"
+            },
             "properties": {
               "hardwareProfile": {
                 "vmSize": "[variables('bastionVM').vmSize]"
@@ -529,6 +595,8 @@
               }
             }
           }
+
+
 
     ],
     "outputs": {

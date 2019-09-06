@@ -37,7 +37,8 @@
             "dataDiskSize": 32,
             "nicName": "masterVM-nic1",
             "pubIpName": "masterVM-pip1",
-            "pubIpType": "Dynamic"
+            "pubIpType": "Dynamic",
+            "privateIp": "10.10.1.10"
         },
         "infraVM": {
             "name": "infraVM-0",
@@ -45,7 +46,8 @@
             "dataDiskSize": 32,
             "nicName": "infraVM-nic1",
             "pubIpName": "infraVM-pip1",
-            "pubIpType": "Dynamic"
+            "pubIpType": "Dynamic",
+            "privateIp": "10.10.1.11"
         },
         "appnodeVM": {
             "name": "appnodeVM-0",
@@ -53,14 +55,16 @@
             "dataDiskSize": 32,
             "nicName": "appnodeVM-nic1",
             "pubIpName": "appnodeVM-pip1",
-            "pubIpType": "Dynamic"
+            "pubIpType": "Dynamic",
+            "privateIp": "10.10.1.12"
         } ,
         "bastionVM": {
             "name": "bastionVM-0",
             "vmSize": "Standard_B1ms",
             "nicName": "bastionVM-nic1",
             "pubIpName": "bastionVM-pip1",
-            "pubIpType": "Dynamic"
+            "pubIpType": "Dynamic",
+            "privateIp": "10.10.1.13"
         }
     },
     "resources": [
@@ -255,7 +259,8 @@
                 {
                   "name": "ipconfig1",
                   "properties": {
-                    "privateIPAllocationMethod": "Dynamic",
+                    "privateIPAllocationMethod": "Static",
+                    "privateIPAddress": "[variables('masterVM').privateIp]",
                     "publicIPAddress": {
                       "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('masterVM').pubIpName)]"
                     },
@@ -281,12 +286,13 @@
                 {
                   "name": "ipconfig1",
                   "properties": {
-                    "privateIPAllocationMethod": "Dynamic",
+                    "privateIPAllocationMethod": "Static",
+                    "privateIPAddress": "[variables('infraVM').privateIp]",
                     "publicIPAddress": {
                       "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('infraVM').pubIpName)]"
                     },
                     "subnet": {
-                      "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vnet1').name, variables('vnet1').infraSubnet)]"
+                        "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vnet1').name, variables('vnet1').masterSubnet)]"
                     }
                   }
                 }
@@ -307,12 +313,13 @@
                 {
                   "name": "ipconfig1",
                   "properties": {
-                    "privateIPAllocationMethod": "Dynamic",
+                    "privateIPAllocationMethod": "Static",
+                    "privateIPAddress": "[variables('appnodeVM').privateIp]",
                     "publicIPAddress": {
                       "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('appnodeVM').pubIpName)]"
                     },
                     "subnet": {
-                      "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vnet1').name, variables('vnet1').appnodeSubnet)]"
+                        "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vnet1').name, variables('vnet1').masterSubnet)]"
                     }
                   }
                 }
@@ -333,12 +340,13 @@
                 {
                   "name": "ipconfig1",
                   "properties": {
-                    "privateIPAllocationMethod": "Dynamic",
+                    "privateIPAllocationMethod": "Static",
+                    "privateIPAddress": "[variables('bastionVM').privateIp]",
                     "publicIPAddress": {
                       "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('bastionVM').pubIpName)]"
                     },
                     "subnet": {
-                      "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vnet1').name, variables('vnet1').infraSubnet)]"
+                        "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vnet1').name, variables('vnet1').masterSubnet)]"
                     }
                   }
                 }

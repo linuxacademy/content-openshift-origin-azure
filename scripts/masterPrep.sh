@@ -30,10 +30,10 @@ echo $(date) " - Changed interface setting to NM_CONTROLLED=yes "
 
 echo $(date) " - Adding entries to host file"
 
-echo "10.10.2.4 bastionVM-0 bastion.example.xip.io" >> /etc/hosts
-echo "10.10.1.4 masterVM-0  master.example.xip.io   okd.master.example.xip.io" >> /etc/hosts
-echo "10.10.2.5 infraVM-0   infra.example.xip.io    apps.okd.infra.example.xip.io" >> /etc/hosts
-echo "10.10.3.4 appnodeVM-0 node.example.xip.io" >> /etc/hosts
+echo "10.10.1.13 bastionVM-0 bastion.example.xip.io" >> /etc/hosts
+echo "10.10.1.10 masterVM-0  master.example.xip.io   okd.master.example.xip.io" >> /etc/hosts
+echo "10.10.1.11 infraVM-0   infra.example.xip.io    apps.okd.infra.example.xip.io" >> /etc/hosts
+echo "10.10.1.12 appnodeVM-0 node.example.xip.io" >> /etc/hosts
 
 echo $(date) " -Entries added to host file"
 

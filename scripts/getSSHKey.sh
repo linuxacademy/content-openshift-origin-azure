@@ -1,6 +1,6 @@
 #!/bin/bash
 
-keyvaultUrl="https://ltajlvault01.vault.azure.net/"
+keyvaultUrl="https://lalabkvwveo6lf3a7vis.vault.azure.net/"
 keyvaultSecretName="sshKey"
 
 token=$(curl 'http://169.254.169.254/metadata/identity/oauth2/token?api-version=2018-02-01&resource=https%3A%2F%2Fvault.azure.net' -H Metadata:true -s | cut -d',' -f1 | cut -d':' -f2 | sed 's/"//g')

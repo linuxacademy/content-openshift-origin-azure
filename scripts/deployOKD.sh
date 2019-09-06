@@ -10,14 +10,6 @@ sed -i -e "s/^enabled=1/enabled=0/" /etc/yum.repos.d/epel.repo
 
 echo $(date) " - EPEL successfully installed"
 
-# Update system to latest packages and install dependencies
-echo $(date) " - Update system to latest packages and install dependencies"
-
-yum -y update
-yum -y install wget git net-tools bind-utils iptables-services bridge-utils bash-completion kexec-tools sos psacct httpd-tools
-
-echo $(date) " - System updates successfully installed"
-
 # Installation Ansible, pyOpenSSL and python-passlib
 echo $(date) " - Installing Ansible, pyOpenSSL and python-passlib"
 
@@ -43,32 +35,6 @@ systemctl start docker
 
 echo $(date) " - Docker started successfully"
 
-echo $(date) " - Changing interface setting to NM_CONTROLLED=yes "
-
-cat <<EOF > /etc/sysconfig/network-scripts/ifcfg-eth0
-DEVICE=eth0
-ONBOOT=yes
-BOOTPROTO=dhcp
-TYPE=Ethernet
-USERCTL=no
-PEERDNS=yes
-IPV6INIT=no
-NM_CONTROLLED=yes
-PERSISTENT_DHCLIENT=yes
-DHCP_HOSTNAME=bastionVM-0
-EOF
-
-echo $(date) " - Changed interface setting to NM_CONTROLLED=yes "
-
-echo $(date) " - Adding entries to host file"
-
-echo "10.10.2.4 bastionVM-0 bastion.example.xip.io" >> /etc/hosts
-echo "10.10.1.4 masterVM-0  master.example.xip.io   okd.master.example.xip.io" >> /etc/hosts
-echo "10.10.2.5 infraVM-0   infra.example.xip.io    apps.okd.infra.example.xip.io" >> /etc/hosts
-echo "10.10.3.4 appnodeVM-0 node.example.xip.io" >> /etc/hosts
-
-echo $(date) " -Entries added to host file"
-
 # Creating Inventory file
 echo $(date) " - Creating Inventory file"
 
@@ -87,12 +53,28 @@ openshift_master_identity_providers=[{'name': 'htpasswd_auth', 'login': 'true', 
 
 openshift_master_cluster_method=native
 openshift_master_cluster_hostname=okd.master.example.xip.io
-openshift_master_cluster_public_hostname=okd.master.example-0.xip.io
+openshift_master_cluster_public_hostname=okd.master.example.xip.io
 
 openshift_master_default_subdomain=apps.okd.infra.example.xip.io
 openshift_use_dnsmasq=True
 
 openshift_disable_check=disk_availability,memory_availability
+
+# metrics
+openshift_metrics_install_metrics=false
+openshift_metrics_cassandra_storage_type=dynamic
+openshift_metrics_storage_volume_size=20Gi
+openshift_metrics_hawkular_nodeselector={"node-role.kubernetes.io/infra": "true"}
+openshift_metrics_cassandra_nodeselector={"node-role.kubernetes.io/infra": "true"}
+openshift_metrics_heapster_nodeselector={"node-role.kubernetes.io/infra": "true"}
+
+# logging
+openshift_logging_install_logging=false
+openshift_logging_es_pvc_dynamic=true
+openshift_logging_storage_volume_size=10Gi
+openshift_logging_kibana_nodeselector={"node-role.kubernetes.io/infra": "true"}
+openshift_logging_curator_nodeselector={"node-role.kubernetes.io/infra": "true"}
+openshift_logging_es_nodeselector={"node-role.kubernetes.io/infra": "true"}
 
 [masters]
 master.example.xip.io

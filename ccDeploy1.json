@@ -25,11 +25,7 @@
             "name": "openshift-vnet",
             "addressSpacePrefix": "10.10.0.0/16",
             "masterSubnet": "master-subnet",
-            "masterSubnetPrefix": "10.10.1.0/24",
-            "infraSubnet": "infra-subnet",
-            "infraSubnetPrefix": "10.10.2.0/24",
-            "appnodeSubnet": "appnode-subnet",
-            "appnodeSubnetPrefix": "10.10.3.0/24"
+            "masterSubnetPrefix": "10.10.1.0/24"
         },
         "masterVM": {
             "name": "masterVM-0",

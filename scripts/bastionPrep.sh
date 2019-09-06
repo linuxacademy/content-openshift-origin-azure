@@ -39,17 +39,20 @@ echo $(date) " -Entries added to host file"
 chmod -R 777 /tmp
 chmod -R 777 /usr/share/ansible/openshift-ansible/playbooks
 
-ssh azureuser@master.example.xip.io uname -a
-sleep 10
-echo "yes"
+wget https://raw.githubusercontent.com/linuxacademy/content-openshift-origin-azure/master/ssh/id_rsa >> .ssh/id_rsa
 
-ssh azureuser@infra.example.xip.io uname -a
-sleep 10
-echo "yes"
+wget https://raw.githubusercontent.com/linuxacademy/content-openshift-origin-azure/master/ssh/id_rsa >> .ssh/id_rsa
 
-ssh azureuser@node.example.xip.io uname -a
-sleep 10
-echo "yes"
+chown azureuser:azureuser .ssh/id_rsa
+chmod 600 .ssh/id_rsa
+chown azureuser:azureuser .ssh/id_rsa.pub
+chmod 600 .ssh/id_rsa.pub
+
+ssh -o StrictHostKeyChecking=no azureuser@master.example.xip.io uname -a
+
+ssh -o StrictHostKeyChecking=no azureuser@infra.example.xip.io uname -a
+
+ssh -o StrictHostKeyChecking=no azureuser@node.example.xip.io uname -a
 
 
 echo $(date) " - Script Complete"

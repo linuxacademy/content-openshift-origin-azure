@@ -26,6 +26,7 @@ DHCP_HOSTNAME=bastionVM-0
 EOF
 
 echo $(date) " - Changed interface setting to NM_CONTROLLED=yes "
+systemctl restart network
 
 echo $(date) " - Adding entries to host file"
 
@@ -34,10 +35,9 @@ echo "10.10.1.10 masterVM-0  master.example.xip.io   okd.master.example.xip.io" 
 echo "10.10.1.11 infraVM-0   infra.example.xip.io    apps.okd.infra.example.xip.io" >> /etc/hosts
 echo "10.10.1.12 appnodeVM-0 node.example.xip.io" >> /etc/hosts
 
-echo $(date) " -Entries added to host file"
+echo $(date) " - Entries added to host file"
 
-chmod -R 777 /tmp
-chmod -R 777 /usr/share/ansible/openshift-ansible/playbooks
+echo $(date) " - Adding SSH keys"
 
 wget https://raw.githubusercontent.com/linuxacademy/content-openshift-origin-azure/master/ssh/id_rsa -P ~/.ssh/
 
@@ -51,6 +51,8 @@ ssh -o StrictHostKeyChecking=no azureuser@master.example.xip.io uname -a
 ssh -o StrictHostKeyChecking=no azureuser@infra.example.xip.io uname -a
 
 ssh -o StrictHostKeyChecking=no azureuser@node.example.xip.io uname -a
+
+echo $(date) " - SSH keys added"
 
 # Install EPEL repository
 echo $(date) " - Installing EPEL"
@@ -84,6 +86,9 @@ systemctl enable docker
 systemctl start docker
 
 echo $(date) " - Docker started successfully"
+
+chmod -R 777 /tmp
+chmod -R 777 /usr/share/ansible/openshift-ansible/playbooks
 
 # Creating Inventory file
 echo $(date) " - Creating Inventory file"

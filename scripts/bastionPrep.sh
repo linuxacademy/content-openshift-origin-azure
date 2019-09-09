@@ -39,14 +39,12 @@ echo $(date) " -Entries added to host file"
 chmod -R 777 /tmp
 chmod -R 777 /usr/share/ansible/openshift-ansible/playbooks
 
-wget https://raw.githubusercontent.com/linuxacademy/content-openshift-origin-azure/master/ssh/id_rsa >> .ssh/id_rsa
+wget https://raw.githubusercontent.com/linuxacademy/content-openshift-origin-azure/master/ssh/id_rsa -P ~/.ssh/
 
-wget https://raw.githubusercontent.com/linuxacademy/content-openshift-origin-azure/master/ssh/id_rsa >> .ssh/id_rsa
+wget https://raw.githubusercontent.com/linuxacademy/content-openshift-origin-azure/master/ssh/id_rsa.pub -P ~/.ssh/
 
-chown azureuser:azureuser .ssh/id_rsa
-chmod 600 .ssh/id_rsa
-chown azureuser:azureuser .ssh/id_rsa.pub
-chmod 600 .ssh/id_rsa.pub
+chown azureuser:azureuser .ssh/id_rsa*
+chmod 600 .ssh/id_rsa*
 
 ssh -o StrictHostKeyChecking=no azureuser@master.example.xip.io uname -a
 

@@ -39,12 +39,12 @@ echo $(date) " - Entries added to host file"
 
 echo $(date) " - Adding SSH keys"
 
-wget https://raw.githubusercontent.com/linuxacademy/content-openshift-origin-azure/master/ssh/id_rsa -P ~/.ssh/
+wget https://raw.githubusercontent.com/linuxacademy/content-openshift-origin-azure/master/ssh/id_rsa -P /home/azureuser/.ssh/
 
-wget https://raw.githubusercontent.com/linuxacademy/content-openshift-origin-azure/master/ssh/id_rsa.pub -P ~/.ssh/
+wget https://raw.githubusercontent.com/linuxacademy/content-openshift-origin-azure/master/ssh/id_rsa.pub -P /home/azureuser/.ssh/
 
-chown azureuser:azureuser .ssh/id_rsa*
-chmod 600 .ssh/id_rsa*
+chown azureuser:azureuser /home/azureuser/.ssh/id_rsa*
+chmod 600 /home/azureuser/.ssh/id_rsa*
 
 ssh -o StrictHostKeyChecking=no azureuser@master.example.xip.io uname -a
 
@@ -111,7 +111,7 @@ openshift_master_cluster_hostname=okd.master.example.xip.io
 openshift_master_cluster_public_hostname=okd.master.example.xip.io
 
 openshift_master_default_subdomain=apps.okd.infra.example.xip.io
-openshift_use_dnsmasq=True
+openshift_use_dnsmasq=False
 
 openshift_disable_check=disk_availability,memory_availability
 

@@ -10,10 +10,9 @@
         "bastionPrepScriptUrl": "[concat(variables('_artifactsLocation'), '/scripts/bastionPrep.sh')]",
 		    "openshiftDeploymentScriptUrl": "[concat(variables('_artifactsLocation'), '/scripts/deployOKD.sh')]",
 		    "nodePrepScriptFileName": "nodePrep.sh",
-        "nodePrepScriptFileName": "nodePrep.sh",
+        "infraPrepScriptFileName": "infraPrep.sh",
 		    "masterPrepScriptFileName": "masterPrep.sh",
         "bastionPrepScriptFileName": "bastionPrep.sh",
-		    "openshiftDeploymentScriptFileName": "deployOKD.sh",
         "adminUserName": "azureuser",
         "sshKeyData": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDqSNF0x69M598PLh7O1GXg968262Lu0lBnzimZ5Bv2ugwaYv3Cti4/Gkh+dbz39HJlGouwnPV5pGA0bO9lZ6cD0UrDjyqnPatoZ6fyIhMwIPufqrXJlHttu6Bwh1wfATCl3LBsGAWhZwH4mERXXtSeBRRmDUeTKDZaMUIFvMOFdWgMJWhoQxnWOxPzwxZfUt9EzxzcKzb6xkrZLR7Zn3gk0kPXCIll/94JJt5u19T6PEFDRpwOhMdeO3+BgBw1KMiA8O2rq2xiZwP5kZuH6m3OrgpwSio7/iCUYXlK3SmDUi3Z2d2BNPuMHZlaXDLlSGYfR/mJhwptPwvFJ8B7m0t/",
         "sshKeyPath": "[concat('/home/', variables('adminUsername'),'/.ssh/authorized_keys')]",
@@ -36,7 +35,11 @@
             "name": "openshift-vnet",
             "addressSpacePrefix": "10.10.0.0/16",
             "masterSubnet": "master-subnet",
-            "masterSubnetPrefix": "10.10.1.0/24"
+            "masterSubnetPrefix": "10.10.1.0/24",
+            "infraSubnet": "infra-subnet",
+            "infraSubnetPrefix": "10.10.2.0/24",
+            "appnodeSubnet": "appnode-subnet",
+            "appnodeSubnetPrefix": "10.10.3.0/24"
         },
         "masterVM": {
             "name": "masterVM-0",
@@ -144,25 +147,7 @@
                             "networkSecurityGroup": {
                                 "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('networkSecurityGroupName'))]"
                             }
-                        }
-                    },
-                    {
-                        "name": "[variables('vNet1').infraSubnet]",
-                        "properties": {
-                            "addressPrefix": "[variables('vNet1').infraSubnetPrefix]",
-                            "networkSecurityGroup": {
-                                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('networkSecurityGroupName'))]"
-                            }
-                        }
-                    },
-                    {
-                        "name": "[variables('vNet1').appnodeSubnet]",
-                        "properties": {
-                            "addressPrefix": "[variables('vNet1').appnodeSubnetPrefix]",
-                            "networkSecurityGroup": {
-                                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('networkSecurityGroupName'))]"
-                            }
-                        }
+                        },
                     }
                 ]
             }
@@ -605,7 +590,7 @@
             "location": "[resourceGroup().location]",
      "apiVersion": "2017-03-30",
      "dependsOn": [
-                "[concat('Microsoft.Compute/virtualMachines/',variables('masterVM').name)]"
+                "[concat('Microsoft.Compute/virtualMachines/',variables('bastionVM').name)]"
      ],
      "properties": {
        "publisher": "Microsoft.Azure.Extensions",
@@ -614,18 +599,14 @@
        "autoUpgradeMinorVersion": true,
        "settings": {
          "fileUris": [
-           "[variables('bastionPrepScriptUrl')]",
-           "[variables('openshiftDeploymentScriptUrl')]"
+           "[variables('bastionPrepScriptUrl')]"
          ]
-       },
-       "protectedSettings": {
-         "commandToExecute": "[concat('bash ', variables('bastionPrepScriptFileName'), ' ', variables('storeageAccountpersistentVolume1'), ' ', variables('adminUserName'), ' ', resourcegroup().location)]"
        },
        "protectedSettings": {
          "commandToExecute": "[concat('bash ', variables('bastionPrepScriptFileName'), ' ', variables('storeageAccountpersistentVolume1'), ' ', variables('adminUserName'), ' ', resourcegroup().location)]"
        }
      }
-          },
+       },
           {
 			"type": "Microsoft.Compute/virtualMachines/extensions",
 			"name": "[concat(variables('masterVM').name, '/prepMaster')]",

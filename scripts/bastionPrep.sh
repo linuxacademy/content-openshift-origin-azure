@@ -3,10 +3,9 @@
 echo $(date) " - Starting Script"
 
 # Update system to latest packages and install dependencies
-echo $(date) " - Update system to latest packages and install dependencies"
+echo $(date) " - Update system to latest packages"
 
 yum -y update
-yum -y install wget git net-tools bind-utils iptables-services bridge-utils bash-completion kexec-tools sos psacct httpd-tools
 
 echo $(date) " - System updates successfully installed"
 
@@ -36,15 +35,14 @@ echo "10.10.1.12 appnodeVM-0 node.example.xip.io" >> /etc/hosts
 
 echo $(date) " -Entries added to host file"
 
-chmod -R 777 /tmp
-chmod -R 777 /usr/share/ansible/openshift-ansible/playbooks
+echo $(date) " - Adding SSH keys"
 
-wget https://raw.githubusercontent.com/linuxacademy/content-openshift-origin-azure/master/ssh/id_rsa -P ~/.ssh/
+wget https://raw.githubusercontent.com/linuxacademy/content-openshift-origin-azure/master/ssh/id_rsa -P /home/azureuser/.ssh/
 
-wget https://raw.githubusercontent.com/linuxacademy/content-openshift-origin-azure/master/ssh/id_rsa.pub -P ~/.ssh/
+wget https://raw.githubusercontent.com/linuxacademy/content-openshift-origin-azure/master/ssh/id_rsa.pub -P /home/azureuser/.ssh/
 
-chown azureuser:azureuser .ssh/id_rsa*
-chmod 600 .ssh/id_rsa*
+chown azureuser:azureuser /home/azureuser/.ssh/id_rsa*
+chmod 600 /home/azureuser/.ssh/id_rsa*
 
 ssh -o StrictHostKeyChecking=no azureuser@master.example.xip.io uname -a
 
@@ -52,5 +50,6 @@ ssh -o StrictHostKeyChecking=no azureuser@infra.example.xip.io uname -a
 
 ssh -o StrictHostKeyChecking=no azureuser@node.example.xip.io uname -a
 
+echo $(date) " - SSH keys added"
 
 echo $(date) " - Script Complete"

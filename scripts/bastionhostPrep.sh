@@ -111,14 +111,15 @@ openshift_master_cluster_hostname=okd.master.example.xip.io
 openshift_master_cluster_public_hostname=okd.master.example.xip.io
 
 openshift_master_default_subdomain=apps.okd.infra.example.xip.io
-openshift_use_dnsmasq=False
+openshift_use_dnsmasq=True
 
 openshift_disable_check=disk_availability,memory_availability
 
 # metrics
 openshift_metrics_install_metrics=false
+openshift_metrics_hawkular_hostname=hawlular-metrics.apps.okd.infra.example.xip.io
 openshift_metrics_cassandra_storage_type=dynamic
-openshift_metrics_storage_volume_size=20Gi
+openshift_metrics_storage_volume_size=5Gi
 openshift_metrics_hawkular_nodeselector={"node-role.kubernetes.io/infra": "true"}
 openshift_metrics_cassandra_nodeselector={"node-role.kubernetes.io/infra": "true"}
 openshift_metrics_heapster_nodeselector={"node-role.kubernetes.io/infra": "true"}
@@ -126,7 +127,7 @@ openshift_metrics_heapster_nodeselector={"node-role.kubernetes.io/infra": "true"
 # logging
 openshift_logging_install_logging=false
 openshift_logging_es_pvc_dynamic=true
-openshift_logging_storage_volume_size=10Gi
+openshift_logging_storage_volume_size=5Gi
 openshift_logging_kibana_nodeselector={"node-role.kubernetes.io/infra": "true"}
 openshift_logging_curator_nodeselector={"node-role.kubernetes.io/infra": "true"}
 openshift_logging_es_nodeselector={"node-role.kubernetes.io/infra": "true"}

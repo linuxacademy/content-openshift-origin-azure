@@ -40,10 +40,29 @@ echo $(date) " -Entries added to host file"
 # Update system to latest packages and install dependencies
 echo $(date) " - Update system to latest packages and install dependencies"
 
-yum -y install wget git net-tools bind-utils iptables-services bridge-utils bash-completion kexec-tools sos psacct httpd-tools
+yum -y install wget git net-tools bind-utils iptables-services bridge-utils bash-completion kexec-tools sos psacct httpd-tools dnsmasq
 yum -y update
 
 echo $(date) " - System updates successfully installed"
+
+echo $(date) " -Entries added to host file"
+
+echo$(date) " - Adding entries to the dnsmasq.conf and starting dnsmasq"
+
+echo "address=/master.example.xip.io/10.10.1.10" >> /etc/dnsmasq.conf
+echo "address=/infra.example.xip.io/10.10.1.11" >> /etc/dnsmasq.conf
+echo "address=/node.example.xip.io/10.10.1.12" >> /etc/dnsmasq.conf
+echo "address=/okd.master.example.xip.io/10.10.1.10" >> /etc/dnsmasq.conf
+echo "address=/apps.okd.infra.example.xip.io/10.10.1.11" >> /etc/dnsmasq.conf
+
+echo "resolv-file=/etc/resolv.dnsmasq" >> /etc/dnsmasq.conf
+
+cp /etc/resov.conf /etc/resolv.dnsmasq
+
+systemctl enable dnsmasq.service
+systemctl start dnsmasq.service
+
+echo$(date) " - Entries to the dnsmasq.conf added and dnsmasq started"
 
 echo $(date) " - Setting up htpasswd as OpenShift Auth Provider"
 

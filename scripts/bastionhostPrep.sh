@@ -46,11 +46,11 @@ wget https://raw.githubusercontent.com/linuxacademy/content-openshift-origin-azu
 chown azureuser:azureuser /home/azureuser/.ssh/id_rsa*
 chmod 600 /home/azureuser/.ssh/id_rsa*
 
-ssh -o StrictHostKeyChecking=no azureuser@master.example.xip.io uname -a
+ssh -o StrictHostKeyChecking=no master.example.xip.io uname -a
 
-ssh -o StrictHostKeyChecking=no azureuser@infra.example.xip.io uname -a
+ssh -o StrictHostKeyChecking=no infra.example.xip.io uname -a
 
-ssh -o StrictHostKeyChecking=no azureuser@node.example.xip.io uname -a
+ssh -o StrictHostKeyChecking=no @node.example.xip.io uname -a
 
 echo $(date) " - SSH keys added"
 
@@ -114,23 +114,6 @@ openshift_master_default_subdomain=apps.okd.infra.example.xip.io
 openshift_use_dnsmasq=True
 
 openshift_disable_check=disk_availability,memory_availability
-
-# metrics
-openshift_metrics_install_metrics=false
-openshift_metrics_hawkular_hostname=hawlular-metrics.apps.okd.infra.example.xip.io
-openshift_metrics_cassandra_storage_type=dynamic
-openshift_metrics_storage_volume_size=5Gi
-openshift_metrics_hawkular_nodeselector={"node-role.kubernetes.io/infra": "true"}
-openshift_metrics_cassandra_nodeselector={"node-role.kubernetes.io/infra": "true"}
-openshift_metrics_heapster_nodeselector={"node-role.kubernetes.io/infra": "true"}
-
-# logging
-openshift_logging_install_logging=false
-openshift_logging_es_pvc_dynamic=true
-openshift_logging_storage_volume_size=5Gi
-openshift_logging_kibana_nodeselector={"node-role.kubernetes.io/infra": "true"}
-openshift_logging_curator_nodeselector={"node-role.kubernetes.io/infra": "true"}
-openshift_logging_es_nodeselector={"node-role.kubernetes.io/infra": "true"}
 
 [masters]
 master.example.xip.io

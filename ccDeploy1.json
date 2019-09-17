@@ -79,13 +79,13 @@
         }
     },
     "resources": [
-        {
-            "apiVersion": "2016-03-30",
-            "type": "Microsoft.Network/virtualNetworks",
-            "name": "[variables('vNet1').name]",
+          {
+            "type": "Microsoft.KeyVault/vaults",
+            "name": "[variables('keyVault').name]",
             "location": "[resourceGroup().location]",
+            "apiVersion": "2018-02-14",
             "dependsOn": [
-                "[concat('Microsoft.Network/networkSecurityGroups/', variables('networkSecurityGroupName'))]"
+            "[concat('Microsoft.Compute/virtualMachines/', variables('masterVM').name)]"
             ],
             "tags": {
               "displayName": "KeyVault"
@@ -301,7 +301,7 @@
                       "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('infraVM').pubIpName)]"
                     },
                     "subnet": {
-                      "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vnet1').name, variables('vnet1').infraSubnet)]"
+                      "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vnet1').name, variables('vnet1').masterSubnet)]"
                     }
                   }
                 }
@@ -328,7 +328,7 @@
                       "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('appnodeVM').pubIpName)]"
                     },
                     "subnet": {
-                      "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vnet1').name, variables('vnet1').appnodeSubnet)]"
+                      "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vnet1').name, variables('vnet1').masterSubnet)]"
                     }
                   }
                 }
@@ -355,7 +355,7 @@
                       "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('bastionVM').pubIpName)]"
                     },
                     "subnet": {
-                      "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vnet1').name, variables('vnet1').infraSubnet)]"
+                      "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vnet1').name, variables('vnet1').masterSubnet)]"
                     }
                   }
                 }

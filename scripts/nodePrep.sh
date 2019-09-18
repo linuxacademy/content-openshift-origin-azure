@@ -23,6 +23,8 @@ PERSISTENT_DHCLIENT=yes
 DHCP_HOSTNAME=appnodeVM-0
 EOF
 
+systemctl restart network
+
 echo $(date) " - Changed interface setting to NM_CONTROLLED=yes "
 
 echo $(date) " - Adding entries to host file"

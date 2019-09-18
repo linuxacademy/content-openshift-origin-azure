@@ -25,8 +25,9 @@ PERSISTENT_DHCLIENT=yes
 DHCP_HOSTNAME=bastionVM-0
 EOF
 
-echo $(date) " - Changed interface setting to NM_CONTROLLED=yes "
 systemctl restart network
+
+echo $(date) " - Changed interface setting to NM_CONTROLLED=yes "
 
 echo $(date) " - Adding entries to host file"
 

@@ -25,8 +25,9 @@ PERSISTENT_DHCLIENT=yes
 DHCP_HOSTNAME=bastionVM-0
 EOF
 
-echo $(date) " - Changed interface setting to NM_CONTROLLED=yes "
 systemctl restart network
+
+echo $(date) " - Changed interface setting to NM_CONTROLLED=yes "
 
 echo $(date) " - Adding entries to host file"
 
@@ -87,7 +88,6 @@ systemctl start docker
 
 echo $(date) " - Docker started successfully"
 
-chmod -R 777 /tmp
 chmod -R 777 /usr/share/ansible/openshift-ansible/playbooks
 
 # Creating Inventory file
@@ -109,7 +109,6 @@ openshift_master_identity_providers=[{'name': 'htpasswd_auth', 'login': 'true', 
 openshift_master_cluster_method=native
 openshift_master_cluster_hostname=okd.master.example.xip.io
 openshift_master_cluster_public_hostname=okd.master.example.xip.io
-
 openshift_master_default_subdomain=apps.okd.infra.example.xip.io
 openshift_use_dnsmasq=True
 

@@ -75,7 +75,7 @@
             "location": "[resourceGroup().location]",
             "apiVersion": "2018-02-14",
             "dependsOn": [
-              "[concat('Microsoft.Compute/virtualMachines/', variables('masterVM').name)]"
+              "[concat('Microsoft.Compute/virtualMachines/', variables('bastionVM').name)]"
             ],
             "tags": {
               "displayName": "KeyVault"

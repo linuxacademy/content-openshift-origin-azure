@@ -68,43 +68,7 @@
         }
     },
     "resources": [
-
-          {
-            "type": "Microsoft.KeyVault/vaults",
-            "name": "[variables('keyVault').name]",
-            "location": "[resourceGroup().location]",
-            "apiVersion": "2018-02-14",
-            "dependsOn": [
-              "[concat('Microsoft.Compute/virtualMachines/', variables('bastionVM').name)]"
-            ],
-            "tags": {
-              "displayName": "KeyVault"
-            },
-            "properties": {
-              "tenantId": "[subscription().tenantId]",
-              "accessPolicies": [
-                {
-                  "objectId": "[reference(concat(resourceId('Microsoft.Compute/virtualMachines', variables('bastionVM').name), '/providers/Microsoft.ManagedIdentity/Identities/default'), '2018-11-30').principalId]",
-                  "tenantId": "[subscription().tenantId]",
-                  "permissions": {
-                    "secrets": [
-                      "all"
-                    ]
-                  }
-                }
-              ],
-              "sku": {
-                "name": "[variables('keyVault').skuName]",
-                "family": "A"
-              },
-              "networkAcls": {
-                "value": {
-                  "defaultAction": "Allow",
-                  "bypass": "AzureServices"
-                }
-              }
-            }
-          },
+      
           {
             "type": "Microsoft.KeyVault/vaults/secrets",
             "name": "[concat(variables('keyVault').name, '/', variables('keyVault').secretName)]",

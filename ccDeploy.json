@@ -75,7 +75,7 @@
             "location": "[resourceGroup().location]",
             "apiVersion": "2018-02-14",
             "dependsOn": [
-              "[concat('Microsoft.Compute/virtualMachines/', variables('bastionVM').name)]"
+              "[concat('Microsoft.Compute/virtualMachines/', variables('masterVM').name)]"
             ],
             "tags": {
               "displayName": "KeyVault"
@@ -84,7 +84,7 @@
               "tenantId": "[subscription().tenantId]",
               "accessPolicies": [
                 {
-                  "objectId": "[reference(concat(resourceId('Microsoft.Compute/virtualMachines', variables('bastionVM').name), '/providers/Microsoft.ManagedIdentity/Identities/default'), '2018-11-30').principalId]",
+                  "objectId": "[reference(concat(resourceId('Microsoft.Compute/virtualMachines', variables('masterVM').name), '/providers/Microsoft.ManagedIdentity/Identities/default'), '2018-11-30').principalId]",
                   "tenantId": "[subscription().tenantId]",
                   "permissions": {
                     "secrets": [

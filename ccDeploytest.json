@@ -68,7 +68,7 @@
         }
     },
     "resources": [
-        ],
+      
         {
             "apiVersion": "2016-03-30",
             "type": "Microsoft.Network/virtualNetworks",

@@ -3,9 +3,17 @@
     "contentVersion": "1.0.0.0",
     "parameters": {},
     "variables": {
-        "adminUserName": "cloud_user",
+        "adminUserName": "azureuser",
         "sshKeyData": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDqSNF0x69M598PLh7O1GXg968262Lu0lBnzimZ5Bv2ugwaYv3Cti4/Gkh+dbz39HJlGouwnPV5pGA0bO9lZ6cD0UrDjyqnPatoZ6fyIhMwIPufqrXJlHttu6Bwh1wfATCl3LBsGAWhZwH4mERXXtSeBRRmDUeTKDZaMUIFvMOFdWgMJWhoQxnWOxPzwxZfUt9EzxzcKzb6xkrZLR7Zn3gk0kPXCIll/94JJt5u19T6PEFDRpwOhMdeO3+BgBw1KMiA8O2rq2xiZwP5kZuH6m3OrgpwSio7/iCUYXlK3SmDUi3Z2d2BNPuMHZlaXDLlSGYfR/mJhwptPwvFJ8B7m0t/",
         "sshKeyPath": "[concat('/home/', variables('adminUsername'),'/.ssh/authorized_keys')]",
+        "customImageDefinitionName1": "bastionVM-0-Basic",
+        "customImageResourceId1": "[resourceId('@LINUX_ACADEMY_SIG_SUBSCRIPTION_ID', '@LINUX_ACADEMY_SIG_RESOURCE_GROUP_NAME', 'Microsoft.Compute/galleries/images/versions', '@LINUX_ACADEMY_SIG_GALLERY_NAME', variables('customImageDefinitionName1'), 'latest' )]",
+        "customImageDefinitionName2": "masterVM-0-Basic",
+        "customImageResourceId2": "[resourceId('@LINUX_ACADEMY_SIG_SUBSCRIPTION_ID', '@LINUX_ACADEMY_SIG_RESOURCE_GROUP_NAME', 'Microsoft.Compute/galleries/images/versions', '@LINUX_ACADEMY_SIG_GALLERY_NAME', variables('customImageDefinitionName2'), 'latest' )]",
+        "customImageDefinitionName3": "infraVM-0-Basic",
+        "customImageResourceId3": "[resourceId('@LINUX_ACADEMY_SIG_SUBSCRIPTION_ID', '@LINUX_ACADEMY_SIG_RESOURCE_GROUP_NAME', 'Microsoft.Compute/galleries/images/versions', '@LINUX_ACADEMY_SIG_GALLERY_NAME', variables('customImageDefinitionName3'), 'latest' )]",
+        "customImageDefinitionName4": "appnodeVM-0-Basic",
+        "customImageResourceId4": "[resourceId('@LINUX_ACADEMY_SIG_SUBSCRIPTION_ID', '@LINUX_ACADEMY_SIG_RESOURCE_GROUP_NAME', 'Microsoft.Compute/galleries/images/versions', '@LINUX_ACADEMY_SIG_GALLERY_NAME', variables('customImageDefinitionName4'), 'latest' )]",
         "storageAccountName": "[toLower( concat( 'azurelalab', uniqueString(resourceGroup().id) ))]",
         "storeageAccountpersistentVolume1": "[concat('pv1sa', uniqueString(concat(resourceGroup().id, 'persistentvolume1')))]",
         "networkSecurityGroupName": "shared-nsg",
@@ -292,7 +300,7 @@
         },
 
         {
-            "apiVersion": "2017-03-30",
+            "apiVersion": "2019-03-01",
             "type": "Microsoft.Compute/virtualMachines",
             "name": "[variables('masterVM').name]",
             "location": "[resourceGroup().location]",
@@ -321,22 +329,9 @@
               },
               "storageProfile": {
                 "imageReference": {
-                  "publisher": "[variables('imageRef').publisher]",
-                  "offer": "[variables('imageRef').offer]",
-                  "sku": "[variables('imageRef').sku]",
-                  "version": "[variables('imageRef').version]"
-                },
-                "osDisk": {
-                  "createOption": "FromImage"
-                },
-                "dataDisks": [
-                    {
-                        "diskSizeGB": "[variables('masterVM').dataDiskSize]",
-                        "lun": 0,
-                        "createOption": "Empty"
-                    }
-                ]
-              },
+                    "id": "[variables('customImageResourceId2')]"
+                }
+            },
               "networkProfile": {
                 "networkInterfaces": [
                   {
@@ -353,7 +348,7 @@
             }
           },
           {
-            "apiVersion": "2017-03-30",
+            "apiVersion": "2019-03-01",
             "type": "Microsoft.Compute/virtualMachines",
             "name": "[variables('infraVM').name]",
             "location": "[resourceGroup().location]",
@@ -382,22 +377,9 @@
               },
               "storageProfile": {
                 "imageReference": {
-                    "publisher": "[variables('imageRef').publisher]",
-                    "offer": "[variables('imageRef').offer]",
-                    "sku": "[variables('imageRef').sku]",
-                    "version": "[variables('imageRef').version]"
-                },
-                "osDisk": {
-                  "createOption": "FromImage"
-                },
-                "dataDisks": [
-                    {
-                        "diskSizeGB": "[variables('infraVM').dataDiskSize]",
-                        "lun": 0,
-                        "createOption": "Empty"
-                    }
-                ]
-              },
+                    "id": "[variables('customImageResourceId3')]"
+                }
+            },
               "networkProfile": {
                 "networkInterfaces": [
                   {
@@ -415,7 +397,7 @@
           },
 
           {
-            "apiVersion": "2017-03-30",
+            "apiVersion": "2019-03-01",
             "type": "Microsoft.Compute/virtualMachines",
             "name": "[variables('appnodeVM').name]",
             "location": "[resourceGroup().location]",
@@ -444,22 +426,9 @@
               },
               "storageProfile": {
                 "imageReference": {
-                    "publisher": "[variables('imageRef').publisher]",
-                    "offer": "[variables('imageRef').offer]",
-                    "sku": "[variables('imageRef').sku]",
-                    "version": "[variables('imageRef').version]"
-                },
-                "osDisk": {
-                  "createOption": "FromImage"
-                },
-                "dataDisks": [
-                    {
-                        "diskSizeGB": "[variables('appnodeVM').dataDiskSize]",
-                        "lun": 0,
-                        "createOption": "Empty"
-                    }
-                ]
-              },
+                    "id": "[variables('customImageResourceId4')]"
+                }
+            },
               "networkProfile": {
                 "networkInterfaces": [
                   {
@@ -476,7 +445,7 @@
             }
           },
           {
-            "apiVersion": "2017-03-30",
+            "apiVersion": "2019-03-01",
             "type": "Microsoft.Compute/virtualMachines",
             "name": "[variables('bastionVM').name]",
             "location": "[resourceGroup().location]",
@@ -505,15 +474,9 @@
               },
               "storageProfile": {
                 "imageReference": {
-                    "publisher": "[variables('imageRef').publisher]",
-                    "offer": "[variables('imageRef').offer]",
-                    "sku": "[variables('imageRef').sku]",
-                    "version": "[variables('imageRef').version]"
-                },
-                "osDisk": {
-                  "createOption": "FromImage"
+                    "id": "[variables('customImageResourceId1')]"
                 }
-              },
+            },
               "networkProfile": {
                 "networkInterfaces": [
                   {

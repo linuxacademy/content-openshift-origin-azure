@@ -51,7 +51,7 @@ ssh -o StrictHostKeyChecking=no master.example.xip.io uname -a
 
 ssh -o StrictHostKeyChecking=no infra.example.xip.io uname -a
 
-ssh -o StrictHostKeyChecking=no @node.example.xip.io uname -a
+ssh -o StrictHostKeyChecking=no node.example.xip.io uname -a
 
 echo $(date) " - SSH keys added"
 

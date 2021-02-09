@@ -1,0 +1,47 @@
+[OSEv3:children]
+masters
+nodes
+
+[OSEv3:vars]
+ansible_ssh_user=azureuser
+ansible_become=true
+openshift_cloudprovider_kind=azure
+osm_controller_args={'cloud-provider': ['azure'], 'cloud-config': ['/etc/origin/cloudprovider/azure.conf']}
+osm_api_server_args={'cloud-provider': ['azure'], 'cloud-config': ['/etc/origin/cloudprovider/azure.conf']}
+openshift_node_kubelet_args={'cloud-provider': ['azure'], 'cloud-config': ['/etc/origin/cloudprovider/azure.conf'], 'enable-controller-attach-detach': ['true']}
+openshift_master_api_port=443
+openshift_master_console_port=443
+openshift_hosted_router_replicas=3
+openshift_hosted_registry_replicas=1
+openshift_master_cluster_method=native
+openshift_master_cluster_hostname=okd.master.example.xip.io
+openshift_master_cluster_public_hostname=okd.master.example.xip.io
+openshift_master_default_subdomain=apps.okd.infra.example.xip.io
+openshift_master_identity_providers=[{'name': 'htpasswd_auth', 'login': 'true', 'challenge': 'true', 'kind': 'HTPasswdPasswordIdentityProvider'}]
+deployment_type=origin
+openshift_use_dnsmasq=True
+openshift_disable_check=disk_availability,memory_availability
+debug_level=2
+
+#cloudprovider
+openshift_cloudprovider_kind=azure
+openshift_cloudprovider_azure_client_id=17b0c26b-41ff-4649-befd-a38f3eec2768
+openshift_cloudprovider_azure_client_secret=Cl0udpr0vid2rs3cr3t
+openshift_cloudprovider_azure_tenant_id=422r3f91-21fe-4esb-vad5-d96dfeooee5d
+openshift_cloudprovider_azure_subscription_id=8227d1d9-c10c-4366-86cc-e3ddbbcbba1d
+openshift_cloudprovider_azure_resource_group=openshift
+openshift_cloudprovider_azure_location=eastus
+#endcloudprovider
+
+
+[masters]
+master.example.xip.io
+
+[etcd]
+master.example.xip.io
+
+
+[nodes]
+master.example.xip.io openshift_node_group_name='node-config-master'
+node.example.xip.io openshift_node_group_name='node-config-compute'
+infra.example.xip.io openshift_node_group_name='node-config-infra'
